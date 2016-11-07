@@ -1,0 +1,34 @@
+{
+  "name": "learningfrontend",
+  "version": "1.0.0",
+  "description": "Learning everything about front end",
+  "main": "./dst/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/talentzxf/LearningFrontEnd.git"
+  },
+  "keywords": [
+    "javascript",
+    "webgl",
+    "html5"
+  ],
+  "author": "vincentzhang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/talentzxf/LearningFrontEnd/issues"
+  },
+  "homepage": "https://github.com/talentzxf/LearningFrontEnd#readme",
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.1.2",
+    "gulp-util": "^3.0.7",
+    "tsify": "^2.0.2",
+    "typescript": "^2.0.7",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
+  }
+}
