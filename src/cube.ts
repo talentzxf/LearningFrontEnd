@@ -8,6 +8,7 @@ function offset(val){
 
 class CubeRenderer{
     cube;
+    geometry;
     constructor(colorIdx: number, scene:THREE.scene){
         var color:number;
         switch(colorIdx){
@@ -22,12 +23,35 @@ class CubeRenderer{
             break;
         }
 
-        var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        var material = new THREE.MeshPhongMaterial( { color: color, specular: 0xffffff,
+        this.geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        var material = new THREE.MeshPhongMaterial( { specular: 0xffffff,
             shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-        this.cube = new THREE.Mesh( geometry, material );
+        //geometry.faces[0].color = new THREE.Color( 0xff0000 );
+        //geometry.faces[1].color = new THREE.Color( 0x000f00 );
+        //geometry.faces[4].color = new THREE.Color( 0xff000f );
+        this.cube = new THREE.Mesh( this.geometry, material );
 
         scene.add(this.cube);
+    }
+
+    colorFace(){
+        for(var faceIdx in this.geometry.faces){
+            var face = this.geometry.faces[faceIdx];
+            if(face.normal.equals(new THREE.Vector3(1,0,0))){
+                face.color = new THREE.Color(0xffff00);
+            } else if(face.normal.equals(new THREE.Vector3(0,1,0))){
+                face.color = new THREE.Color(0xff0000);
+            } else if(face.normal.equals(new THREE.Vector3(0,0,1))){
+                face.color = new THREE.Color(0x0000ff);
+            } else if(face.normal.equals(new THREE.Vector3(-1,0,0))){
+                face.color = new THREE.Color(0x00ff00);
+            } else if(face.normal.equals(new THREE.Vector3(0,-1,0))){
+                face.color = new THREE.Color(0x00ffff);
+            } else if(face.normal.equals(new THREE.Vector3(0,0,-1))){
+                face.color = new THREE.Color(0xff00ff);
+            }
+
+        }
     }
 
     setPos(coord:Coordinate){
@@ -47,6 +71,9 @@ export class Cube{
         this.coord = new Coordinate(x,y,z);
         this.renderer = new CubeRenderer(color, scene);
         this.renderer.setPos(this.coord);
+    }
+    colorFace(){
+        this.renderer.colorFace();
     }
 
     print(){

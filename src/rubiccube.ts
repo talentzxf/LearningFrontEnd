@@ -21,11 +21,17 @@ function initEnvironment(){
     hemiLight.position.set( 0, 500, 0 );
     scene.add( hemiLight );
 
-    var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-    dirLight.color.setHSL( 0.1, 1, 0.95 );
-    dirLight.position.set( -1, 1.75, 1 );
-    dirLight.position.multiplyScalar( 50 );
-    scene.add( dirLight );
+    var hemiLight2 = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+    hemiLight.color.setHSL( 0.6, 1, 0.6 );
+    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+    hemiLight.position.set( 0, -500, 0 );
+    scene.add( hemiLight2 );
+
+    //var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+    //dirLight.color.setHSL( 0.1, 1, 0.95 );
+    //dirLight.position.set( -1, 1.75, 1 );
+    //dirLight.position.multiplyScalar( 50 );
+    //scene.add( dirLight );
 
 
     var render = function () {
@@ -42,12 +48,14 @@ function initEnvironment(){
     //    }
     //}
 
+    var cubes = [];
     for(var x = -1; x <= 1; x++ ){
         for(var y=-1 ; y<=1 ; y++ ){
             for( var z=-1; z<=1 ;z++){
-                new Cube(x,y,z,1,scene);
+                var newCube = new Cube(x,y,z, 1 ,scene);
+                newCube.colorFace();
+                cubes.push(newCube);
             }
-
         }
     }
 
