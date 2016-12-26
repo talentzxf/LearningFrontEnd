@@ -41,13 +41,15 @@ function initEnvironment(){
     var render = function () {
         requestAnimationFrame( render );
 
-        //var curCubeArray = cubes['L'];
+        var curCubeArray = cubes['L'];
+        curCubeArray.rotateX(angle);
         //for(var cubeIdx in curCubeArray){
         //    var cube = curCubeArray[cubeIdx];
-        //    cube.rotateX(angle);
+        //    // cube.rotateX(angle);
+        //    // cube.rotateAxisAngle(new THREE.Vector3(1,0,0), angle);
         //}
-        //
-        //angle += 0.00001;
+
+        angle += 0.00001;
 
         renderer.render(scene, camera);
     };
@@ -60,12 +62,12 @@ function initEnvironment(){
     //    }
     //}
 
-    cubes['F'] = [];
-    cubes['R'] = [];
-    cubes['L'] = [];
-    cubes['D'] = [];
-    cubes['U'] = [];
-    cubes['B'] = [];
+    cubes['F'] = new THREE.Object3D();
+    cubes['R'] = new THREE.Object3D();
+    cubes['L'] = new THREE.Object3D();
+    cubes['D'] = new THREE.Object3D();
+    cubes['U'] = new THREE.Object3D();
+    cubes['B'] = new THREE.Object3D();
 
     for(var x = -1; x <= 1; x++ ){
         for(var y=-1 ; y<=1 ; y++ ){
@@ -73,8 +75,11 @@ function initEnvironment(){
                 var newCube = new Cube(x,y,z,scene);
                 newCube.colorFace();
 
-                if(x == -1 )
-                    cubes['L'].push(newCube);
+                if(x == -1 ){
+                    cubes['L'].add(newCube.getGeometry());
+                    scene.add(cubes['L']);
+                }
+
             }
         }
     }

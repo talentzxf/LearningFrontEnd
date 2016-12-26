@@ -53,6 +53,15 @@ class CubeRenderer{
         this.cube.rotateX(angle);
     }
 
+    rotateAxisAngle(axis:THREE.Vector3, angle:number){
+
+        this.cube.rotateOnAxis(axis, angle);
+    }
+
+    getGeometry(){
+        return this.cube;
+    }
+
 }
 
 export class Cube{
@@ -70,8 +79,14 @@ export class Cube{
     rotateX(angle){
         this.renderer.rotateX(angle);
     }
+    rotateAxisAngle(axis:THREE.Vector3, angle:number){
+        this.renderer.rotateAxisAngle(axis, angle);
+    }
     print(){
        this.coord.print();
+    }
+    getGeometry(){
+        return this.renderer.getGeometry();
     }
 
 }
