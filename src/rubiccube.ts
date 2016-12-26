@@ -1,16 +1,15 @@
 import {Cube} from './cube';
+import {CubeRotater} from './CubeRotater';
+var renderer;
+var scene;
 
-var cubes = [];
+var cubeRotater;
 
-var angle = 0;
-
-function initEnvironment(){
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( 40, window.innerWidth/window.innerHeight, 0.1, 1000 );
-
-    var renderer = new THREE.WebGLRenderer({ antialias: true } );
+function init3DRenderer(scene:THREE.Scene, borderLength:number){
+    renderer = new THREE.WebGLRenderer({ antialias: true } );
+    var camera = new THREE.PerspectiveCamera( 40, 1.0, 0.1, 1000 );
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( borderLength, borderLength);
     document.body.appendChild( renderer.domElement );
 
     // controls
@@ -31,67 +30,60 @@ function initEnvironment(){
     hemiLight.position.set( 0, -500, 0 );
     scene.add( hemiLight2 );
 
-    //var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-    //dirLight.color.setHSL( 0.1, 1, 0.95 );
-    //dirLight.position.set( -1, 1.75, 1 );
-    //dirLight.position.multiplyScalar( 50 );
-    //scene.add( dirLight );
+    renderer.renderScene = function () {
+        requestAnimationFrame( renderer.renderScene );
 
 
-    var render = function () {
-        requestAnimationFrame( render );
+        if(cubeRotater){
+            cubeRotater.update();
+        }
 
-        var curCubeArray = cubes['L'];
-        curCubeArray.rotateX(angle);
-        //for(var cubeIdx in curCubeArray){
-        //    var cube = curCubeArray[cubeIdx];
-        //    // cube.rotateX(angle);
-        //    // cube.rotateAxisAngle(new THREE.Vector3(1,0,0), angle);
-        //}
-
-        angle += 0.00001;
 
         renderer.render(scene, camera);
     };
 
-    //for(var x=-1; x<=1 ;x++){
-    //    for(var y=-1; y<=1 ;y++){
-    //        for(var z=-1; z<=1 ;z++){
-    //            new Cube(x,y,z,1,scene);
-    //        }
-    //    }
-    //}
+}
 
-    cubes['F'] = new THREE.Object3D();
-    cubes['R'] = new THREE.Object3D();
-    cubes['L'] = new THREE.Object3D();
-    cubes['D'] = new THREE.Object3D();
-    cubes['U'] = new THREE.Object3D();
-    cubes['B'] = new THREE.Object3D();
+function initTopViewRenderer(scene:THREE.Scene, borderLength:number){
+    var topViewRenderer = new THREE.WebGLRenderer({antialias: true});
+    topViewRenderer.setPixelRatio( window.devicePixelRatio );
+    topViewRenderer.setSize( borderLength, borderLength );
+    document.body.appendChild(topViewRenderer.domElement);
 
-    for(var x = -1; x <= 1; x++ ){
-        for(var y=-1 ; y<=1 ; y++ ){
-            for( var z=-1; z<=1 ;z++){
-                var newCube = new Cube(x,y,z,scene);
-                newCube.colorFace();
+}
 
-                if(x == -1 ){
-                    cubes['L'].add(newCube.getGeometry());
-                    scene.add(cubes['L']);
-                }
+function initEnvironment(){
+    scene = new THREE.Scene();
+    cubeRotater = new CubeRotater(scene);
 
-            }
-        }
-    }
+    var borderLength = Math.min(window.innerWidth/2 - 20, window.innerHeight);
+
+    console.log("Border length is:" + borderLength);
+
+    init3DRenderer(scene, borderLength);
+    initTopViewRenderer(scene, borderLength);
 
     //new Cube(-1,0,0,1,scene);
     //new Cube(1,0,0,1,scene);
 
-    render();
+    renderer.renderScene();
+
 }
+
 
 export function RubicCube(){
     initEnvironment();
+    initCommands();
+}
+
+function initCommands(){
+
+    if(!window.input_command){
+        window.input_command = function(commandSeries:string){
+            cubeRotater.apply_command(commandSeries);
+        }
+    }
+
 }
 
 RubicCube();

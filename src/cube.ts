@@ -67,6 +67,7 @@ class CubeRenderer{
 export class Cube{
     coord:Coordinate;
     renderer: CubeRenderer;
+    tags:Array = [];
     constructor(x:number, y:number, z:number, scene:THREE.scene){
         this.coord = new Coordinate(x,y,z);
         this.renderer = new CubeRenderer(scene);
@@ -89,4 +90,7 @@ export class Cube{
         return this.renderer.getGeometry();
     }
 
+    addTag(c:string){
+        this.tags.push(c);
+    }
 }
