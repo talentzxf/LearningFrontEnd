@@ -1,5 +1,17 @@
 import {Cube} from './cube';
 
+THREE.Object3D._matrixAux = new THREE.Matrix4(); // global auxiliar variable
+// Warnings: 1) axis is assumed to be normalized.
+//  2) matrix must be updated. If not, call object.updateMatrix() first
+//  3) this assumes we are not using quaternions
+THREE.Object3D.prototype.rotateAroundWorldAxis = function(axis, radians) {
+    THREE.Object3D._matrixAux.makeRotationAxis(axis, radians);
+    this.matrix.multiplyMatrices(THREE.Object3D._matrixAux,this.matrix); // r56
+    THREE.Object3D._matrixAux.extractRotation(this.matrix);
+    this.rotation.setFromRotationMatrix(THREE.Object3D._matrixAux, this.eulerOrder );
+    this.position.getPositionFromMatrix( this.matrix );
+}
+
 export class CubeRotater{
     cubes = [];
     angle = 0;
@@ -46,32 +58,38 @@ export class CubeRotater{
 
                     if(x == -1 ){
                         this.cubes['L'].push(newCube);
+                        newCube.getGeometry().tag += "L";
                         newCube.addTag('L');
                     }
 
                     if(x == 1){
                         this.cubes['R'].push(newCube);
                         newCube.addTag('R');
+                        newCube.getGeometry().tag += "R";
                     }
 
                     if(y == -1){
                         this.cubes['D'].push(newCube);
                         newCube.addTag('D');
+                        newCube.getGeometry().tag += "D";
                     }
 
                     if(y == 1){
                         this.cubes['U'].push(newCube);
                         newCube.addTag('U');
+                        newCube.getGeometry().tag += "U";
                     }
 
                     if(z == -1 ){
                         this.cubes['B'].push(newCube);
                         newCube.addTag('B');
+                        newCube.getGeometry().tag += "B";
                     }
 
                     if(z == 1){
                         this.cubes['F'].push(newCube);
                         newCube.addTag('F');
+                        newCube.getGeometry().tag += "F";
                     }
                 }
             }
@@ -80,7 +98,12 @@ export class CubeRotater{
 
     update(){
         if(this.rotating){
-            this.curRotatingCubesObj.setRotationFromAxisAngle(this.rotateAxis, this.angle);
+            // this.curRotatingCubesObj.setRotationFromAxisAngle(this.rotateAxis, this.angle);
+            var childArray = this.curRotatingCubesObj.children.slice();
+            for(var idx in childArray){
+                var obj = childArray[idx];
+                obj.rotateAroundWorldAxis(this.rotateAxis, 0.01);
+            }
             this.angle += 0.01;
         }
 
@@ -92,7 +115,7 @@ export class CubeRotater{
             for( var idx in childArray ){
                 console.log("Add back:" + idx);
                 this.scene.add(childArray[idx]);
-                childArray[idx].rotateOnAxis(this.rotateAxis, Math.PI/2);
+                // childArray[idx].rotateOnAxis(this.rotateAxis, Math.PI/2);
             }
 
             this.rotating = false;
