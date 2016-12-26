@@ -1,5 +1,9 @@
 import {Cube} from './cube';
 
+var cubes = [];
+
+var angle = 0;
+
 function initEnvironment(){
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera( 40, window.innerWidth/window.innerHeight, 0.1, 1000 );
@@ -37,6 +41,14 @@ function initEnvironment(){
     var render = function () {
         requestAnimationFrame( render );
 
+        //var curCubeArray = cubes['L'];
+        //for(var cubeIdx in curCubeArray){
+        //    var cube = curCubeArray[cubeIdx];
+        //    cube.rotateX(angle);
+        //}
+        //
+        //angle += 0.00001;
+
         renderer.render(scene, camera);
     };
 
@@ -48,13 +60,21 @@ function initEnvironment(){
     //    }
     //}
 
-    var cubes = [];
+    cubes['F'] = [];
+    cubes['R'] = [];
+    cubes['L'] = [];
+    cubes['D'] = [];
+    cubes['U'] = [];
+    cubes['B'] = [];
+
     for(var x = -1; x <= 1; x++ ){
         for(var y=-1 ; y<=1 ; y++ ){
             for( var z=-1; z<=1 ;z++){
-                var newCube = new Cube(x,y,z, 1 ,scene);
+                var newCube = new Cube(x,y,z,scene);
                 newCube.colorFace();
-                cubes.push(newCube);
+
+                if(x == -1 )
+                    cubes['L'].push(newCube);
             }
         }
     }
@@ -63,12 +83,10 @@ function initEnvironment(){
     //new Cube(1,0,0,1,scene);
 
     render();
-
 }
 
 export function RubicCube(){
     initEnvironment();
-
 }
 
 RubicCube();

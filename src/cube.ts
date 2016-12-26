@@ -9,20 +9,7 @@ function offset(val){
 class CubeRenderer{
     cube;
     geometry;
-    constructor(colorIdx: number, scene:THREE.scene){
-        var color:number;
-        switch(colorIdx){
-            case 0:
-                color = 0xff0000;
-            break;
-            case 1:
-                color = 0xffff00;
-            break;
-            case 2:
-                color = 0x0000ff;
-            break;
-        }
-
+    constructor(scene:THREE.scene){
         this.geometry = new THREE.BoxGeometry( 1, 1, 1 );
         var material = new THREE.MeshPhongMaterial( { specular: 0xffffff,
             shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
@@ -62,20 +49,27 @@ class CubeRenderer{
         this.cube.position.z = offset(coord.z);
     }
 
+    rotateX(angle){
+        this.cube.rotateX(angle);
+    }
+
 }
 
 export class Cube{
     coord:Coordinate;
     renderer: CubeRenderer;
-    constructor(x:number, y:number, z:number, color:number, scene:THREE.scene){
+    constructor(x:number, y:number, z:number, scene:THREE.scene){
         this.coord = new Coordinate(x,y,z);
-        this.renderer = new CubeRenderer(color, scene);
+        this.renderer = new CubeRenderer(scene);
         this.renderer.setPos(this.coord);
     }
     colorFace(){
         this.renderer.colorFace();
     }
 
+    rotateX(angle){
+        this.renderer.rotateX(angle);
+    }
     print(){
        this.coord.print();
     }
