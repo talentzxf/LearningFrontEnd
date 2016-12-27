@@ -15,7 +15,6 @@ THREE.Object3D.prototype.rotateAroundWorldAxis = function(axis, radians) {
 export class CubeRotater{
     cubes = [];
     angle = 0;
-    eps = 0.01;
     rotating = false;
     speed = 0.01;
 
@@ -53,50 +52,56 @@ export class CubeRotater{
         this.scene = scene;
         this.initFaceRotateMap();
 
-        for(var index in this.faceIndexArray){
+        for(let index in this.faceIndexArray){
             this.cubes[this.faceIndexArray[index]] = [];
         }
 
-        for(var x = -1; x <= 1; x++ ){
-            for(var y=-1 ; y<=1 ; y++ ){
-                for( var z=-1; z<=1 ;z++){
-                    var newCube = new Cube(x,y,z,scene);
+        for(let x = -1; x <= 1; x++ ){
+            for(let y=-1 ; y<=1 ; y++ ){
+                for( let z=-1; z<=1 ;z++){
+                    let newCube = new Cube(x,y,z,scene);
                     newCube.colorFace();
 
                     if(x == -1 ){
                         this.cubes['L'].push(newCube);
                         newCube.getGeometry().tag += "L";
                         newCube.addTag('L');
+                        newCube.addOriginTag('L');
                     }
 
                     if(x == 1){
                         this.cubes['R'].push(newCube);
                         newCube.addTag('R');
                         newCube.getGeometry().tag += "R";
+                        newCube.addOriginTag('R');
                     }
 
                     if(y == -1){
                         this.cubes['D'].push(newCube);
                         newCube.addTag('D');
                         newCube.getGeometry().tag += "D";
+                        newCube.addOriginTag('D');
                     }
 
                     if(y == 1){
                         this.cubes['U'].push(newCube);
                         newCube.addTag('U');
                         newCube.getGeometry().tag += "U";
+                        newCube.addOriginTag('U');
                     }
 
                     if(z == -1 ){
                         this.cubes['B'].push(newCube);
                         newCube.addTag('B');
                         newCube.getGeometry().tag += "B";
+                        newCube.addOriginTag('B');
                     }
 
                     if(z == 1){
                         this.cubes['F'].push(newCube);
                         newCube.addTag('F');
                         newCube.getGeometry().tag += "F";
+                        newCube.addOriginTag('F');
                     }
                 }
             }
@@ -105,23 +110,25 @@ export class CubeRotater{
 
     update(){
         if(this.rotating){
-            // this.curRotatingCubesObj.setRotationFromAxisAngle(this.rotateAxis, this.angle);
-            var childArray = this.cubes[this.rotatingFace];
-            for(var idx in childArray){
-                var obj = childArray[idx].getGeometry();
+            let childArray = this.cubes[this.rotatingFace];
+            for(let idx in childArray){
+                let cube = childArray[idx];
+                // console.log("Rotating:" + cube.getOriginTags());
+                let obj = cube.getGeometry();
                 obj.rotateAroundWorldAxis(this.rotateAxis, this.speed);
             }
             this.angle += this.speed;
         }
 
 
-        if( Math.abs( this.angle - Math.PI/2 ) < this.eps ){
+        if( this.angle > Math.PI/2 ){
             this.angle = 0;
+            this.rotating = false;
 
             // Move from one face to another
-            for( var idx in childArray ){
-                var cube = childArray[idx];
-                var tags = cube.getTags();
+            for( let idx in childArray ){
+                let cube = childArray[idx];
+                let tags = cube.getTags();
                 for(let tagIdx in tags){
                     let tag = tags[tagIdx];
                     if(this.faceRotateMap[this.rotateAxisIndex][tag] != null){
@@ -130,21 +137,26 @@ export class CubeRotater{
                         this.cubes[tag] = _.without(this.cubes[tag], cube);
                     }
                 }
+             }
 
-                // After tag update, consolidate tag with cube array
+            // Reconsolidate all cubes according to tag
+            for( let idx in childArray ){
+                let cube = childArray[idx];
+                let tags = cube.getTags();
                 for(let tagIdx in tags){
                     let tag = tags[tagIdx];
-                    this.cubes[tag].push(cube);
+                    if(this.faceRotateMap[this.rotateAxisIndex][tag] != null){
+                        this.cubes[tag].push(cube);
+                    }
                 }
             }
 
-            this.rotating = false;
             console.log("Stopped rotating!");
         }
     }
 
     apply_command(commands:string){
-        var c = commands;
+        let c = commands;
 
         if(this.rotating){
             console.log("Rotating, please wait!");
@@ -169,8 +181,8 @@ export class CubeRotater{
     }
 
     show_face(face:string, isVisible:boolean){
-        var cubes = this.cubes[face];
-        for(var cubeIdx in cubes){
+        let cubes = this.cubes[face];
+        for(let cubeIdx in cubes){
             if(isVisible){
                 this.scene.add(cubes[cubeIdx].getGeometry());
             }else{

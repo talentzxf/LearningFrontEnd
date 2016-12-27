@@ -61,7 +61,7 @@ function initEnvironment(){
     console.log("Border length is:" + borderLength);
 
     init3DRenderer(scene, borderLength);
-    initTopViewRenderer(scene, borderLength);
+    // initTopViewRenderer(scene, borderLength);
 
     //new Cube(-1,0,0,1,scene);
     //new Cube(1,0,0,1,scene);
