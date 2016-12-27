@@ -16,7 +16,7 @@ export class CubeRotater{
     cubes = [];
     angle = 0;
     rotating = false;
-    speed = 0.01;
+    speed = 0.1;
 
     faceIndexArray = ['F','R','L','D','U','B'];
     faceRotateMap = {};
@@ -122,6 +122,17 @@ export class CubeRotater{
 
 
         if( this.angle > Math.PI/2 ){
+            // Compensate angel error
+            let errorAngle = Math.PI/2 - this.angle;
+            console.log("Fixing angle:" + errorAngle);
+            let childArray = this.cubes[this.rotatingFace];
+            for(let idx in childArray){
+                let cube = childArray[idx];
+                // console.log("Rotating:" + cube.getOriginTags());
+                let obj = cube.getGeometry();
+                obj.rotateAroundWorldAxis(this.rotateAxis, errorAngle);
+            }
+            
             this.angle = 0;
             this.rotating = false;
 
