@@ -90,7 +90,23 @@ export class Cube{
         return this.renderer.getGeometry();
     }
 
+    setTag(idx:number,c:string){
+        this.tags[idx] = c;
+    }
+
     addTag(c:string){
         this.tags.push(c);
+    }
+
+    getTags(){
+        return this.tags;
+    }
+
+    consolidateTag(fromFace:string, toFace:string){
+        for(var tagIdx in this.tags){
+            if(this.tags[tagIdx] == fromFace){
+                this.tags[tagIdx] = toFace;
+            }
+        }
     }
 }

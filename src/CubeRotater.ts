@@ -8,8 +8,8 @@ THREE.Object3D.prototype.rotateAroundWorldAxis = function(axis, radians) {
     THREE.Object3D._matrixAux.makeRotationAxis(axis, radians);
     this.matrix.multiplyMatrices(THREE.Object3D._matrixAux,this.matrix); // r56
     THREE.Object3D._matrixAux.extractRotation(this.matrix);
-    this.rotation.setFromRotationMatrix(THREE.Object3D._matrixAux, this.eulerOrder );
-    this.position.getPositionFromMatrix( this.matrix );
+    this.rotation.setFromRotationMatrix(THREE.Object3D._matrixAux, this.rotation.order );
+    this.position.setFromMatrixPosition( this.matrix );
 }
 
 export class CubeRotater{
@@ -17,16 +17,17 @@ export class CubeRotater{
     angle = 0;
     eps = 0.01;
     rotating = false;
-    curRotatingCubesObj = new THREE.Object3D();
+    speed = 0.01;
 
     faceIndexArray = ['F','R','L','D','U','B'];
     faceRotateMap = {};
     rotateAxis:THREE.Vector3;
+    rotateAxisIndex:string;
     scene:THREE.Scene;
 
-    constructor(scene){
-        this.scene = scene;
+    rotatingFace:string;
 
+    initFaceRotateMap(){
         this.faceRotateMap['X'] = {};
         this.faceRotateMap['Y'] = {};
         this.faceRotateMap['Z'] = {};
@@ -45,6 +46,12 @@ export class CubeRotater{
         this.faceRotateMap['Z']['L'] = 'D';
         this.faceRotateMap['Z']['D'] = 'R';
         this.faceRotateMap['Z']['R'] = 'U';
+
+    }
+
+    constructor(scene){
+        this.scene = scene;
+        this.initFaceRotateMap();
 
         for(var index in this.faceIndexArray){
             this.cubes[this.faceIndexArray[index]] = [];
@@ -99,23 +106,36 @@ export class CubeRotater{
     update(){
         if(this.rotating){
             // this.curRotatingCubesObj.setRotationFromAxisAngle(this.rotateAxis, this.angle);
-            var childArray = this.curRotatingCubesObj.children.slice();
+            var childArray = this.cubes[this.rotatingFace];
             for(var idx in childArray){
-                var obj = childArray[idx];
-                obj.rotateAroundWorldAxis(this.rotateAxis, 0.01);
+                var obj = childArray[idx].getGeometry();
+                obj.rotateAroundWorldAxis(this.rotateAxis, this.speed);
             }
-            this.angle += 0.01;
+            this.angle += this.speed;
         }
 
 
         if( Math.abs( this.angle - Math.PI/2 ) < this.eps ){
             this.angle = 0;
 
-            var childArray = this.curRotatingCubesObj.children.slice();
+            // Move from one face to another
             for( var idx in childArray ){
-                console.log("Add back:" + idx);
-                this.scene.add(childArray[idx]);
-                // childArray[idx].rotateOnAxis(this.rotateAxis, Math.PI/2);
+                var cube = childArray[idx];
+                var tags = cube.getTags();
+                for(let tagIdx in tags){
+                    let tag = tags[tagIdx];
+                    if(this.faceRotateMap[this.rotateAxisIndex][tag] != null){
+                        cube.setTag(tagIdx, this.faceRotateMap[this.rotateAxisIndex][tag]);
+                        // Remove from previous arrays;
+                        this.cubes[tag] = _.without(this.cubes[tag], cube);
+                    }
+                }
+
+                // After tag update, consolidate tag with cube array
+                for(let tagIdx in tags){
+                    let tag = tags[tagIdx];
+                    this.cubes[tag].push(cube);
+                }
             }
 
             this.rotating = false;
@@ -131,23 +151,31 @@ export class CubeRotater{
             return;
         }
 
-        // Clear current rotating cube.
-        this.curRotatingCubesObj.children = [];
-        for(var cubeIdx in this.cubes[c]){
-            this.curRotatingCubesObj.add(this.cubes[c][cubeIdx].getGeometry());
-        }
-
         this.angle = 0;
-        this.scene.add(this.curRotatingCubesObj);
         this.rotating = true;
 
-        if(c == 'L' || c == 'R'){
-            this.rotateAxis = new THREE.Vector3(1,0,0)
-        } else if(c == 'U' || c == 'D'){
-            this.rotateAxis = new THREE.Vector3(0,1,0)
-        } else if(c == 'F' || c == 'B'){
-            this.rotateAxis = new THREE.Vector3(0,0,1)
-        }
+        this.rotatingFace = c;
 
+        if(c == 'L' || c == 'R'){
+            this.rotateAxis = new THREE.Vector3(1,0,0);
+            this.rotateAxisIndex = 'X';
+        } else if(c == 'U' || c == 'D'){
+            this.rotateAxis = new THREE.Vector3(0,1,0);
+            this.rotateAxisIndex = 'Y';
+        } else if(c == 'F' || c == 'B'){
+            this.rotateAxis = new THREE.Vector3(0,0,1);
+            this.rotateAxisIndex = 'Z';
+        }
+    }
+
+    show_face(face:string, isVisible:boolean){
+        var cubes = this.cubes[face];
+        for(var cubeIdx in cubes){
+            if(isVisible){
+                this.scene.add(cubes[cubeIdx].getGeometry());
+            }else{
+                this.scene.remove(cubes[cubeIdx].getGeometry());
+            }
+        }
     }
 }

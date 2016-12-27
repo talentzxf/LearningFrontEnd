@@ -84,6 +84,12 @@ function initCommands(){
         }
     }
 
+    if(!window.show_face){
+        window.show_face = function(face:string, isVisible:boolean){
+            cubeRotater.show_face(face, isVisible)
+        }
+    }
+
 }
 
 RubicCube();
