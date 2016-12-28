@@ -228,8 +228,22 @@ export class CubeRotater{
     }
 
     buffer_commands(commands:string){
+        // Parse command to array.
+        let resArray = [];
+        for(let idx in commands){
+            let char = commands.charAt(idx);
+            if(char == "'"){
+                resArray[resArray.length-1] = resArray[resArray.length-1]+"'";
+            } else if(char == 2){
+                resArray.push(resArray[resArray.length-1]);
+            } else if(char == ' '){
+                continue;
+            } else {
+                resArray.push(char);
+            }
+        }
         // Convert string to array
-        this.bufferedCommands = this.bufferedCommands.concat(Array.from(commands));
+        this.bufferedCommands = this.bufferedCommands.concat(resArray);
     }
 
     apply_command(command:string){

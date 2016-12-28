@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Hello World!</title>
+    <script src="../lib/jquery-3.1.1.min.js"></script>
     <script src="../lib/three.min.js"></script>
     <script src="http://underscorejs.org/underscore-min.js"></script>
     <script src="../lib/js/controls/OrbitControls.js"></script>
@@ -10,13 +11,27 @@
 <body>
     <script type="application/javascript" src="./bundle.js"></script>
 
-    <input type="button" name="L" value="L" onclick="input_command('L')">
-    <input type="button" name="R" value="R" onclick="input_command('R')">
-    <input type="button" name="U" value="U" onclick="input_command('U')">
-    <input type="button" name="D" value="D" onclick="input_command('D')">
-    <input type="button" name="F" value="F" onclick="input_command('F')">
-    <input type="button" name="B" value="B" onclick="input_command('B')">
+    <script type="application/javascript">
+        $(document).ready(function(){
+            $("#submitCubeSeq").click(
+                    function(){
+                        let commands = $("#cubeSeqText").val()
+                        buffer_commands(commands);
+                    }
+            )
+        })
+    </script>
 
-    <input type="button" name="RandomRotate" value="true" onclick="toggle_random()">
+    <!--<input type="button" name="L" value="L" onclick="input_command('L')">-->
+    <!--<input type="button" name="R" value="R" onclick="input_command('R')">-->
+    <!--<input type="button" name="U" value="U" onclick="input_command('U')">-->
+    <!--<input type="button" name="D" value="D" onclick="input_command('D')">-->
+    <!--<input type="button" name="F" value="F" onclick="input_command('F')">-->
+    <!--<input type="button" name="B" value="B" onclick="input_command('B')">-->
+
+    <input id="cubeSeqText" type="text" >
+    <input id="submitCubeSeq" type="button" name="Submit" value="OK">
+
+    <input type="button" name="RandomRotate" value="ToggleRandom" onclick="toggle_random()">
 </body>
 </html>
