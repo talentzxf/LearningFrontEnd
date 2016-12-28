@@ -18,47 +18,93 @@ export class CubeRotater{
     rotating = false;
     speed = 0.1;
 
-    faceIndexArray = ['F','R','L','D','U','B'];
+    faceIndexArray = ["F","R","L","D","U","B"];
+
+    // Add reverse commands.
+    faceCommandArray = this.faceIndexArray.concat(["F'","R'","L'","D'","U'","B'"]);
+
     faceRotateMap = {};
+    faceReverseMap = {};
     rotateAxis:THREE.Vector3;
-    rotateAxisIndex:string;
     scene:THREE.Scene;
 
     rotatingFace:string;
 
+    // CW -- clock wise. Positive
+    // CCW -- counter clock wise. Negative
+    rotateCW:boolean;
+
+    bufferedCommands:Array = [];
+    genRandomSequence:boolean = false;
+
+    getReverse(face:string){
+        return this.faceReverseMap[face];
+    }
+
     initFaceRotateMap(){
-        this.faceRotateMap['X'] = {};
-        this.faceRotateMap['Y'] = {};
-        this.faceRotateMap['Z'] = {};
+        this.initFaceReverseMap();
 
-        this.faceRotateMap['X']['F'] = 'D';
-        this.faceRotateMap['X']['D'] = 'B';
-        this.faceRotateMap['X']['B'] = 'U';
-        this.faceRotateMap['X']['U'] = 'F';
+        for(let faceIdx in this.faceIndexArray){
+            let face = this.faceIndexArray[faceIdx];
+            this.faceRotateMap[face] = {};
+        }
 
-        this.faceRotateMap['Y']['F'] = 'R';
-        this.faceRotateMap['Y']['R'] = 'B';
-        this.faceRotateMap['Y']['B'] = 'L';
-        this.faceRotateMap['Y']['L'] = 'F';
+        // All clockwise rotation
+        this.faceRotateMap['L']['F'] = 'D';
+        this.faceRotateMap['L']['D'] = 'B';
+        this.faceRotateMap['L']['B'] = 'U';
+        this.faceRotateMap['L']['U'] = 'F';
 
-        this.faceRotateMap['Z']['U'] = 'L';
-        this.faceRotateMap['Z']['L'] = 'D';
-        this.faceRotateMap['Z']['D'] = 'R';
-        this.faceRotateMap['Z']['R'] = 'U';
+        this.faceRotateMap['R']['F'] = this.getReverse('D');
+        this.faceRotateMap['R']['D'] = this.getReverse('B');
+        this.faceRotateMap['R']['B'] = this.getReverse('U');
+        this.faceRotateMap['R']['U'] = this.getReverse('F');
 
+        this.faceRotateMap['U']['F'] = 'L';
+        this.faceRotateMap['U']['R'] = 'F';
+        this.faceRotateMap['U']['B'] = 'R';
+        this.faceRotateMap['U']['L'] = 'B';
+
+        this.faceRotateMap['D']['F'] = this.getReverse('L');
+        this.faceRotateMap['D']['R'] = this.getReverse('F');
+        this.faceRotateMap['D']['B'] = this.getReverse('R');
+        this.faceRotateMap['D']['L'] = this.getReverse('B');
+
+        this.faceRotateMap['F']['U'] = 'R';
+        this.faceRotateMap['F']['L'] = 'U';
+        this.faceRotateMap['F']['D'] = 'L';
+        this.faceRotateMap['F']['R'] = 'D';
+
+        this.faceRotateMap['B']['U'] = this.getReverse('R');
+        this.faceRotateMap['B']['L'] = this.getReverse('U');
+        this.faceRotateMap['B']['D'] = this.getReverse('L');
+        this.faceRotateMap['B']['R'] = this.getReverse('D');
+    }
+
+    initFaceReverseMap(){
+        this.faceReverseMap['F'] = 'B';
+        this.faceReverseMap['L'] = 'R';
+        this.faceReverseMap['U'] = 'D';
+
+        this.faceReverseMap['B'] = 'F';
+        this.faceReverseMap['R'] = 'L';
+        this.faceReverseMap['D'] = 'U';
     }
 
     constructor(scene){
         this.scene = scene;
+
         this.initFaceRotateMap();
 
         for(let index in this.faceIndexArray){
             this.cubes[this.faceIndexArray[index]] = [];
         }
 
-        for(let x = -1; x <= 1; x++ ){
-            for(let y=-1 ; y<=1 ; y++ ){
-                for( let z=-1; z<=1 ;z++){
+        let half_dim=1;
+
+        for(let x = -half_dim; x <= half_dim; x++ ){
+            for(let y=-half_dim ; y<=half_dim ; y++ ){
+                for( let z=-half_dim; z<=half_dim ;z++){
                     let newCube = new Cube(x,y,z,scene);
                     newCube.colorFace();
 
@@ -118,60 +164,117 @@ export class CubeRotater{
                 obj.rotateAroundWorldAxis(this.rotateAxis, this.speed);
             }
             this.angle += this.speed;
-        }
 
+            if( this.angle > Math.PI/2 ){
+                // Compensate angel error
+                let errorAngle = Math.PI/2 - this.angle;
+                console.log("Fixing angle:" + errorAngle);
+                let childArray = this.cubes[this.rotatingFace];
+                for(let idx in childArray){
+                    let cube = childArray[idx];
+                    // console.log("Rotating:" + cube.getOriginTags());
+                    let obj = cube.getGeometry();
+                    obj.rotateAroundWorldAxis(this.rotateAxis, errorAngle);
+                }
 
-        if( this.angle > Math.PI/2 ){
-            // Compensate angel error
-            let errorAngle = Math.PI/2 - this.angle;
-            console.log("Fixing angle:" + errorAngle);
-            let childArray = this.cubes[this.rotatingFace];
-            for(let idx in childArray){
-                let cube = childArray[idx];
-                // console.log("Rotating:" + cube.getOriginTags());
-                let obj = cube.getGeometry();
-                obj.rotateAroundWorldAxis(this.rotateAxis, errorAngle);
-            }
-            
-            this.angle = 0;
-            this.rotating = false;
+                this.angle = 0;
 
-            // Move from one face to another
-            for( let idx in childArray ){
-                let cube = childArray[idx];
-                let tags = cube.getTags();
-                for(let tagIdx in tags){
-                    let tag = tags[tagIdx];
-                    if(this.faceRotateMap[this.rotateAxisIndex][tag] != null){
-                        cube.setTag(tagIdx, this.faceRotateMap[this.rotateAxisIndex][tag]);
-                        // Remove from previous arrays;
-                        this.cubes[tag] = _.without(this.cubes[tag], cube);
+                // Move from one face to another
+                for( let idx in childArray ){
+                    let cube = childArray[idx];
+                    let tags = cube.getTags();
+                    for(let tagIdx in tags){
+                        let tag = tags[tagIdx];
+                        if(this.faceRotateMap[this.rotatingFace][tag] != null){
+                            if(this.rotateCW){
+                                cube.setTag(tagIdx, this.faceRotateMap[this.rotatingFace][tag]);
+                            }else{
+                                cube.setTag(tagIdx, this.getReverse(this.faceRotateMap[this.rotatingFace][tag]));
+                            }
+
+                            // Remove from previous arrays;
+                            this.cubes[tag] = _.without(this.cubes[tag], cube);
+                        }
                     }
                 }
-             }
 
-            // Reconsolidate all cubes according to tag
-            for( let idx in childArray ){
-                let cube = childArray[idx];
-                let tags = cube.getTags();
-                for(let tagIdx in tags){
-                    let tag = tags[tagIdx];
-                    if(this.faceRotateMap[this.rotateAxisIndex][tag] != null){
-                        this.cubes[tag].push(cube);
+                // Reconsolidate all cubes according to tag
+                for( let idx in childArray ){
+                    let cube = childArray[idx];
+                    let tags = cube.getTags();
+                    for(let tagIdx in tags){
+                        let tag = tags[tagIdx];
+                        if(this.faceRotateMap[this.rotatingFace][tag] != null)
+                            this.cubes[tag].push(cube);
                     }
                 }
+
+                this.rotating = false;
+                console.log("Stopped rotating!");
             }
 
-            console.log("Stopped rotating!");
+        }else{
+            this.executeNextCommand();
         }
     }
 
-    apply_command(commands:string){
-        let c = commands;
+    executeNextCommand(){
+        if(this.bufferedCommands.length){
+            this.apply_command(this.bufferedCommands.shift());
+        }else if(this.genRandomSequence){
+            let faceIdx = Math.floor(Math.random() * 100) % this.faceCommandArray.length;
+            this.apply_command( this.faceCommandArray[faceIdx] );
+        }
+    }
+
+    buffer_commands(commands:string){
+        // Convert string to array
+        this.bufferedCommands = this.bufferedCommands.concat(Array.from(commands));
+    }
+
+    apply_command(command:string){
+        let c = command;
 
         if(this.rotating){
             console.log("Rotating, please wait!");
             return;
+        }
+
+        switch(c){
+            case "L":
+            case "R'":
+                this.rotateAxis = new THREE.Vector3(1,0,0);
+                break;
+            case "L'":
+            case "R":
+                this.rotateAxis = new THREE.Vector3(-1,0,0);
+                break;
+            case "U":
+            case "D'":
+                this.rotateAxis = new THREE.Vector3(0,-1,0);
+                break;
+            case "U'":
+            case "D":
+                this.rotateAxis = new THREE.Vector3(0,1,0);
+                break;
+            case "F":
+            case "B'":
+                this.rotateAxis = new THREE.Vector3(0,0,-1);
+                break;
+
+            case "F'":
+            case "B":
+                this.rotateAxis = new THREE.Vector3(0,0,1);
+                break;
+            default:
+                console.log("Encountered unknown command:" + c)
+        }
+
+        if(c.indexOf("'") == 1){
+            this.rotateCW = false;
+            c = c.charAt(0);
+        }else{
+            this.rotateCW = true;
         }
 
         this.angle = 0;
@@ -179,16 +282,6 @@ export class CubeRotater{
 
         this.rotatingFace = c;
 
-        if(c == 'L' || c == 'R'){
-            this.rotateAxis = new THREE.Vector3(1,0,0);
-            this.rotateAxisIndex = 'X';
-        } else if(c == 'U' || c == 'D'){
-            this.rotateAxis = new THREE.Vector3(0,1,0);
-            this.rotateAxisIndex = 'Y';
-        } else if(c == 'F' || c == 'B'){
-            this.rotateAxis = new THREE.Vector3(0,0,1);
-            this.rotateAxisIndex = 'Z';
-        }
     }
 
     show_face(face:string, isVisible:boolean){
@@ -200,5 +293,9 @@ export class CubeRotater{
                 this.scene.remove(cubes[cubeIdx].getGeometry());
             }
         }
+    }
+
+    toggle_random(){
+        this.genRandomSequence = !this.genRandomSequence;
     }
 }

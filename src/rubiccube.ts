@@ -84,9 +84,21 @@ function initCommands(){
         }
     }
 
+    if(!window.buffer_commands){
+        window.buffer_commands = function(commandSeries:string){
+            cubeRotater.buffer_commands(commandSeries);
+        }
+    }
+
     if(!window.show_face){
         window.show_face = function(face:string, isVisible:boolean){
             cubeRotater.show_face(face, isVisible)
+        }
+    }
+
+    if(!window.toggle_random){
+        window.toggle_random = function(){
+            cubeRotater.toggle_random();
         }
     }
 
