@@ -5,10 +5,11 @@
     <title>Hello World!</title>
     <script src="../lib/jquery-3.1.1.min.js"></script>
     <script src="../lib/three.min.js"></script>
-    <script src="http://underscorejs.org/underscore-min.js"></script>
+    <script src="../lib/underscore-min.js"></script>
     <script src="../lib/js/controls/OrbitControls.js"></script>
     </head>
 <body>
+
     <script type="application/javascript" src="./bundle.js"></script>
 
     <script type="application/javascript">
@@ -19,8 +20,49 @@
                         buffer_commands(commands);
                     }
             )
+            $("#setCube").click(function(){
+                let faces = [];
+                faces.push( $("#frontFace").val() );
+                faces.push( $("#leftFace").val() );
+                faces.push( $("#rightFace").val() );
+                faces.push( $("#upFace").val() );
+                faces.push( $("#backFace").val());
+                faces.push( $("#downFace").val() );
+
+                let colorCount = [];
+                // Check if each face is 9
+                for(let faceIdx in faces){
+                    let face = faces[faceIdx];
+                    if(face.length == null || face.length != 9 ){
+                        alert("Should input 9 faces in every text input!");
+                        return;
+                    }
+
+                    for(let colorIdx = 0 ; colorIdx < face.length; colorIdx++){
+                        let color = face[colorIdx];
+                        if( null == colorCount[face] ){
+                            colorCount[face] = 1;
+                        } else {
+                            colorCount[face]++;
+                        }
+                    }
+                }
+
+                for(let colorIdx in colorCount){
+                    if(colorCount[colorIdx] != 9 ){
+                        alert("Color" + colorIdx + " is wrong");
+                        return;
+                    }
+                }
+
+                console.log("Passed basic validation!")
+
+                reset_cube_initface(faces);
+            })
         })
     </script>
+
+
 
     <!--<input type="button" name="L" value="L" onclick="input_command('L')">-->
     <!--<input type="button" name="R" value="R" onclick="input_command('R')">-->
@@ -33,5 +75,44 @@
     <input id="submitCubeSeq" type="button" name="Submit" value="OK">
 
     <input type="button" name="RandomRotate" value="ToggleRandom" onclick="toggle_random()">
+    <input type="button" name="ResetCube" value="ResetCube" onclick="reset_cube()">
+
+    <!-- Input color window -->
+    <table>
+        <th>
+            <tr>
+                <td>index</td>
+                <td> color sequence</td>
+            </tr>
+        </th>
+        <tbody>
+        <tr>
+            <td>Front face</td>
+            <td><input type="text" value="BOYOBBROW" id="frontFace"></td>
+        </tr>
+        <tr>
+            <td>Left face</td>
+            <td><input type="text" value="ORRGOYWRY" id="leftFace"></td>
+        </tr>
+        <tr>
+            <td>Right face</td>
+            <td><input type="text" value="RBORROOWG" id="rightFace"></td>
+        </tr>
+        <tr>
+            <td>Up face</td>
+            <td><input type="text" value="BGGGYYWBG" id="upFace"></td>
+        </tr>
+        <tr>
+            <td>Back face</td>
+            <td><input type="text" value="YYYWGWOWG" id="backFace"></td>
+        </tr>
+        <tr>
+            <td>Down face</td>
+            <td><input type="text" value="BGBYWBRRW" id="downFace"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <input type="button" id="setCube" value="SetCubeColor">
 </body>
 </html>

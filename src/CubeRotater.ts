@@ -1,4 +1,5 @@
 import {Cube} from './cube';
+import {FaceCalculator} from "./FaceCalculator";
 
 THREE.Object3D._matrixAux = new THREE.Matrix4(); // global auxiliar variable
 // Warnings: 1) axis is assumed to be normalized.
@@ -16,7 +17,7 @@ export class CubeRotater{
     cubes = [];
     angle = 0;
     rotating = false;
-    speed = 0.1;
+    speed = 0.5;
 
     faceIndexArray = ["F","R","L","D","U","B"];
 
@@ -36,6 +37,8 @@ export class CubeRotater{
 
     bufferedCommands:Array = [];
     genRandomSequence:boolean = false;
+    faceCalculator: FaceCalculator;
+
 
     getReverse(face:string){
         return this.faceReverseMap[face];
@@ -91,10 +94,19 @@ export class CubeRotater{
         this.faceReverseMap['D'] = 'U';
     }
 
-    constructor(scene){
-        this.scene = scene;
+    removeSelf(){
+        for(let cubesIdx in this.cubes){
+            let cubes = this.cubes[cubesIdx];
+            for(let cubeIdx in cubes){
+                let cube = cubes[cubeIdx];
+                this.scene.remove(cube.getGeometry())
+            }
+        }
+    }
 
-        this.initFaceRotateMap();
+    initCubes(faces){
+
+        this.faceCalculator = new FaceCalculator(faces);
 
         for(let index in this.faceIndexArray){
             this.cubes[this.faceIndexArray[index]] = [];
@@ -105,8 +117,7 @@ export class CubeRotater{
         for(let x = -half_dim; x <= half_dim; x++ ){
             for(let y=-half_dim ; y<=half_dim ; y++ ){
                 for( let z=-half_dim; z<=half_dim ;z++){
-                    let newCube = new Cube(x,y,z,scene);
-                    newCube.colorFace();
+                    let newCube = new Cube(x,y,z,this.scene);
 
                     if(x == -1 ){
                         this.cubes['L'].push(newCube);
@@ -149,10 +160,23 @@ export class CubeRotater{
                         newCube.getGeometry().tag += "F";
                         newCube.addOriginTag('F');
                     }
+
+                    newCube.colorFace();
+                    this.faceCalculator.colorCube(newCube);
+
                 }
             }
         }
+
     }
+
+    constructor(scene, faces){
+        this.scene = scene;
+
+        this.initFaceRotateMap();
+        this.initCubes(faces);
+    }
+
 
     update(){
         if(this.rotating){
@@ -236,7 +260,10 @@ export class CubeRotater{
                 resArray[resArray.length-1] = resArray[resArray.length-1]+"'";
             } else if(char == 2){
                 resArray.push(resArray[resArray.length-1]);
-            } else if(char == ' '){
+            } else if(char == 3){
+                resArray.push(resArray[resArray.length-1]);
+                resArray.push(resArray[resArray.length-1]);
+            } else if(char == ' ' || char == 1){
                 continue;
             } else {
                 resArray.push(char);

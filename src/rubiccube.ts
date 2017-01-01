@@ -16,7 +16,7 @@ function init3DRenderer(scene:THREE.Scene, borderLength:number){
     var controls = new THREE.OrbitControls( camera, renderer.domElement );
     controls.minDistance = 20;
     controls.maxDistance = 50;
-    controls.maxPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI;
 
     var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
@@ -76,6 +76,16 @@ export function RubicCube(){
     initCommands();
 }
 
+function reset_cube(){
+    cubeRotater.removeSelf();
+    cubeRotater = new CubeRotater(scene);
+}
+
+function reset_cube_initface(faces:Array){
+    cubeRotater.removeSelf();
+    cubeRotater = new CubeRotater(scene, faces);
+}
+
 function initCommands(){
 
     if(!window.input_command){
@@ -99,6 +109,18 @@ function initCommands(){
     if(!window.toggle_random){
         window.toggle_random = function(){
             cubeRotater.toggle_random();
+        }
+    }
+
+    if(!window.reset_cube){
+        window.reset_cube = function(){
+            reset_cube();
+        }
+    }
+
+    if(!window.reset_cube_initface){
+        window.reset_cube_initface = function(faces:Array){
+            reset_cube_initface(faces);
         }
     }
 

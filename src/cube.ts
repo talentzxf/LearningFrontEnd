@@ -6,6 +6,15 @@ function offset(val){
     if(val < 0) return val-0.1;
 }
 
+enum COLORS{
+    B = 0x0000FF,  // blue
+    Y = 0xFFFF00,  // yellow
+    G = 0x00FF00,  // green
+    O = 0xFF9900,  // orange
+    R = 0xFF0000,  // red
+    W = 0xFFFFFF   // white
+}
+
 class CubeRenderer{
     cube;
     geometry;
@@ -25,19 +34,18 @@ class CubeRenderer{
         for(var faceIdx in this.geometry.faces){
             var face = this.geometry.faces[faceIdx];
             if(face.normal.equals(new THREE.Vector3(1,0,0))){
-                face.color = new THREE.Color(0xffff00);
+                face.color = new THREE.Color(COLORS.G);
             } else if(face.normal.equals(new THREE.Vector3(0,1,0))){
-                face.color = new THREE.Color(0xff0000);
+                face.color = new THREE.Color(COLORS.R);
             } else if(face.normal.equals(new THREE.Vector3(0,0,1))){
-                face.color = new THREE.Color(0x0000ff);
+                face.color = new THREE.Color(COLORS.W);
             } else if(face.normal.equals(new THREE.Vector3(-1,0,0))){
-                face.color = new THREE.Color(0x00ff00);
+                face.color = new THREE.Color(COLORS.B);
             } else if(face.normal.equals(new THREE.Vector3(0,-1,0))){
-                face.color = new THREE.Color(0x00ffff);
+                face.color = new THREE.Color(COLORS.O);
             } else if(face.normal.equals(new THREE.Vector3(0,0,-1))){
-                face.color = new THREE.Color(0xff00ff);
+                face.color = new THREE.Color(COLORS.Y);
             }
-
         }
     }
 
@@ -60,6 +68,36 @@ class CubeRenderer{
 
     getGeometry(){
         return this.cube;
+    }
+
+    setFaceColor(f:string,c:string){
+        let faceArray = f.split("");
+        let colorArray = c.split("");
+
+        let colorFaceMapObj = _.object(faceArray,colorArray);
+
+        for(var faceIdx in this.geometry.faces){
+            var face = this.geometry.faces[faceIdx];
+            if(face.normal.equals(new THREE.Vector3(1,0,0))){
+                if(colorFaceMapObj.R != null )
+                    face.color = new THREE.Color(COLORS[colorFaceMapObj.R]);
+            } else if(face.normal.equals(new THREE.Vector3(0,1,0))){
+                if(colorFaceMapObj.U != null )
+                    face.color = new THREE.Color(COLORS[colorFaceMapObj.U]);
+            } else if(face.normal.equals(new THREE.Vector3(0,0,1))){
+                if(colorFaceMapObj.F != null )
+                    face.color = new THREE.Color(COLORS[colorFaceMapObj.F]);
+            } else if(face.normal.equals(new THREE.Vector3(-1,0,0))){
+                if(colorFaceMapObj.L != null )
+                    face.color = new THREE.Color(COLORS[colorFaceMapObj.L]);
+            } else if(face.normal.equals(new THREE.Vector3(0,-1,0))){
+                if(colorFaceMapObj.D != null )
+                    face.color = new THREE.Color(COLORS[colorFaceMapObj.D]);
+            } else if(face.normal.equals(new THREE.Vector3(0,0,-1))){
+                if(colorFaceMapObj.B != null )
+                    face.color = new THREE.Color(COLORS[colorFaceMapObj.B]);
+            }
+        }
     }
 
 }
@@ -105,6 +143,10 @@ export class Cube{
 
     addOriginTag(c:string){
         this.originTags.push(c);
+    }
+
+    setFaceColor(f:string, c:string){
+        this.renderer.setFaceColor(f,c);
     }
 
     getOriginTags(){
