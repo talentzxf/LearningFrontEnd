@@ -102,94 +102,105 @@ export class CubicSolver {
 
             //--- Current (start) state.
             let cubie = this.inputArray[i];
-            //while( (currentState[i] = find( goal, goal+20, cubie ) - goal) == 20){
-            //    cubie = cubie.substr( 1 ) + cubie[0];
-            //    currentState[i+20]++;
-            //}
+
+            let idx = -1;
+            while( idx == -1 ){
+                cubie = cubie.substr( 1 ) + cubie[0];
+                idx =  goal.find(cubie);
+                if(idx == -1){
+                    if(currentState.indexOf(i) == -1)
+                        currentState[i] = 0;
+                    else{
+                        currentState[i]++;
+                    }
+                }
+
+            }
         }
-    //
-    //    //--- Dance the funky Thistlethwaite...
-    //    while( ++phase < 5 ){
-    //
-    //        //--- Compute ids for current and goal state, skip phase if equal.
-    //        vi currentId = id( currentState ), goalId = id( goalState );
-    //        if( currentId == goalId )
-    //            continue;
-    //
-    //        //--- Initialize the BFS queue.
-    //        queue<vi> q;
-    //        q.push( currentState );
-    //        q.push( goalState );
-    //
-    //        //--- Initialize the BFS tables.
-    //        map<vi,vi> predecessor;
-    //        map<vi,int> direction, lastMove;
-    //        direction[ currentId ] = 1;
-    //        direction[ goalId ] = 2;
-    //
-    //        //--- Dance the funky bidirectional BFS...
-    //        while( 1 ){
-    //
-    //            //--- Get state from queue, compute its ID and get its direction.
-    //            vi oldState = q.front();
-    //            q.pop();
-    //            vi oldId = id( oldState );
-    //            int& oldDir = direction[oldId];
-    //
-    //            //--- Apply all applicable moves to it and handle the new state.
-    //            for( int move=0; move<18; move++ ){
-    //                if( applicableMoves[phase] & (1 << move) ){
-    //
-    //                    //--- Apply the move.
-    //                    vi newState = applyMove( move, oldState );
-    //                    vi newId = id( newState );
-    //                    int& newDir = direction[newId];
-    //
-    //                    //--- Have we seen this state (id) from the other direction already?
-    //                    //--- I.e. have we found a connection?
-    //                    if( newDir  &&  newDir != oldDir ){
-    //
-    //                        //--- Make oldId represent the forwards and newId the backwards search state.
-    //                        if( oldDir > 1 ){
-    //                            swap( newId, oldId );
-    //                            move = inverse( move );
-    //                        }
-    //
-    //                        //--- Reconstruct the connecting algorithm.
-    //                        vi algorithm( 1, move );
-    //                        while( oldId != currentId ){
-    //                            algorithm.insert( algorithm.begin(), lastMove[ oldId ] );
-    //                            oldId = predecessor[ oldId ];
-    //                        }
-    //                        while( newId != goalId ){
-    //                            algorithm.push_back( inverse( lastMove[ newId ] ));
-    //                            newId = predecessor[ newId ];
-    //                        }
-    //
-    //                        //--- Print and apply the algorithm.
-    //                        for( int i=0; i<(int)algorithm.size(); i++ ){
-    //                            cout << "UDFBLR"[algorithm[i]/3] << algorithm[i]%3+1;
-    //                            currentState = applyMove( algorithm[i], currentState );
-    //                        }
-    //
-    //                        //--- Jump to the next phase.
-    //                        goto nextPhasePlease;
-    //                    }
-    //
-    //                    //--- If we've never seen this state (id) before, visit it.
-    //                    if( ! newDir ){
-    //                        q.push( newState );
-    //                        newDir = oldDir;
-    //                        lastMove[ newId ] = move;
-    //                        predecessor[ newId ] = oldId;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        nextPhasePlease:
-    //            ;
-    //    }
-    //}
+
+
+        //--- Dance the funky Thistlethwaite...
+        while( ++this.phase < 5 ){
+
+            //--- Compute ids for current and goal state, skip phase if equal.
+            let currentId = this.id(currentState), goalId = this.id(goalState);
+            if(_.isEqual(currentId, goalId))
+                continue;
+
+            //--- Initialize the BFS queue.
+        //    queue<vi> q;
+        //    q.push( currentState );
+        //    q.push( goalState );
+        //
+        //    //--- Initialize the BFS tables.
+        //    map<vi,vi> predecessor;
+        //    map<vi,int> direction, lastMove;
+        //    direction[ currentId ] = 1;
+        //    direction[ goalId ] = 2;
+        //
+        //    //--- Dance the funky bidirectional BFS...
+        //    while( 1 ){
+        //
+        //        //--- Get state from queue, compute its ID and get its direction.
+        //        vi oldState = q.front();
+        //        q.pop();
+        //        vi oldId = id( oldState );
+        //        int& oldDir = direction[oldId];
+        //
+        //        //--- Apply all applicable moves to it and handle the new state.
+        //        for( int move=0; move<18; move++ ){
+        //            if( applicableMoves[phase] & (1 << move) ){
+        //
+        //                //--- Apply the move.
+        //                vi newState = applyMove( move, oldState );
+        //                vi newId = id( newState );
+        //                int& newDir = direction[newId];
+        //
+        //                //--- Have we seen this state (id) from the other direction already?
+        //                //--- I.e. have we found a connection?
+        //                if( newDir  &&  newDir != oldDir ){
+        //
+        //                    //--- Make oldId represent the forwards and newId the backwards search state.
+        //                    if( oldDir > 1 ){
+        //                        swap( newId, oldId );
+        //                        move = inverse( move );
+        //                    }
+        //
+        //                    //--- Reconstruct the connecting algorithm.
+        //                    vi algorithm( 1, move );
+        //                    while( oldId != currentId ){
+        //                        algorithm.insert( algorithm.begin(), lastMove[ oldId ] );
+        //                        oldId = predecessor[ oldId ];
+        //                    }
+        //                    while( newId != goalId ){
+        //                        algorithm.push_back( inverse( lastMove[ newId ] ));
+        //                        newId = predecessor[ newId ];
+        //                    }
+        //
+        //                    //--- Print and apply the algorithm.
+        //                    for( int i=0; i<(int)algorithm.size(); i++ ){
+        //                        cout << "UDFBLR"[algorithm[i]/3] << algorithm[i]%3+1;
+        //                        currentState = applyMove( algorithm[i], currentState );
+        //                    }
+        //
+        //                    //--- Jump to the next phase.
+        //                    goto nextPhasePlease;
+        //                }
+        //
+        //                //--- If we've never seen this state (id) before, visit it.
+        //                if( ! newDir ){
+        //                    q.push( newState );
+        //                    newDir = oldDir;
+        //                    lastMove[ newId ] = move;
+        //                    predecessor[ newId ] = oldId;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    nextPhasePlease:
+        //        ;
+        //}
+    }
     }
 
 
