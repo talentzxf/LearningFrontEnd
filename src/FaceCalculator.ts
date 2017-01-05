@@ -127,7 +127,9 @@ export class FaceCalculator{
 
         let retStr = ""
         for(let faceIdx in this.faceMap){
-            retStr += this.faceMap[faceIdx] + " ";
+            if(this.faceMap.hasOwnProperty(faceIdx)){
+                retStr += this.faceMap[faceIdx] + " ";
+            }
         }
         console.log("20-elements input format is:" + retStr);
 

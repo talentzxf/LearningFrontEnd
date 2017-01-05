@@ -28,7 +28,7 @@ export class CubicSolver {
             [1, 8, 5, 10, 1, 0, 4, 7],   // R
         ];
 
-    phase:number;
+    phase:number = 0;
     inputArray:Array;
 
     inverse(move:number) {
@@ -117,12 +117,13 @@ export class CubicSolver {
             let idx = -1;
             while (idx == -1) {
                 cubie = cubie.substr(1) + cubie[0];
-                idx = goal.find(cubie);
+                idx = goal.indexOf(cubie);
                 if (idx == -1) {
                     if (currentState.indexOf(i) == -1)
-                        currentState[i] = 0;
+                        currentState[i + 20] = 0;
                     else {
-                        currentState[i]++;
+                        currentState[i + 20]++;
+                        currentState[i] = idx;
                     }
                 }
 
