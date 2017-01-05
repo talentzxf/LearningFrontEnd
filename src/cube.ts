@@ -20,7 +20,7 @@ class CubeRenderer{
     geometry;
     constructor(scene:THREE.scene){
         this.geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        var material = new THREE.MeshPhongMaterial( { specular: 0xffffff,
+        let material = new THREE.MeshPhongMaterial( { specular: 0xffffff,
             shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
         //geometry.faces[0].color = new THREE.Color( 0xff0000 );
         //geometry.faces[1].color = new THREE.Color( 0x000f00 );
@@ -31,8 +31,8 @@ class CubeRenderer{
     }
 
     colorFace(){
-        for(var faceIdx in this.geometry.faces){
-            var face = this.geometry.faces[faceIdx];
+        for(let faceIdx = 0; faceIdx < this.geometry.faces.length; faceIdx++){
+            let face = this.geometry.faces[faceIdx];            
             if(face.normal.equals(new THREE.Vector3(1,0,0))){
                 face.color = new THREE.Color(COLORS.G);
             } else if(face.normal.equals(new THREE.Vector3(0,1,0))){
@@ -76,8 +76,7 @@ class CubeRenderer{
 
         let colorFaceMapObj = _.object(faceArray,colorArray);
 
-        for(var faceIdx in this.geometry.faces){
-            var face = this.geometry.faces[faceIdx];
+        this.geometry.faces.forEach(function(face){
             if(face.normal.equals(new THREE.Vector3(1,0,0))){
                 if(colorFaceMapObj.R != null )
                     face.color = new THREE.Color(COLORS[colorFaceMapObj.R]);
@@ -97,7 +96,7 @@ class CubeRenderer{
                 if(colorFaceMapObj.B != null )
                     face.color = new THREE.Color(COLORS[colorFaceMapObj.B]);
             }
-        }
+        })
     }
 
 }
@@ -154,7 +153,7 @@ export class Cube{
     }
 
     consolidateTag(fromFace:string, toFace:string){
-        for(var tagIdx in this.tags){
+        for(let tagIdx in this.tags){
             if(this.tags[tagIdx] == fromFace){
                 this.tags[tagIdx] = toFace;
             }

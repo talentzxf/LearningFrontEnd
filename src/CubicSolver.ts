@@ -17,6 +17,7 @@ Array.prototype.subarray = function (start, end) {
 }
 
 export class CubicSolver {
+    applicableMoves:Array = [0, 262143, 259263, 74943, 74898];
     affectedCubies:Array =
         [
             [0, 1, 2, 3, 0, 1, 2, 3],   // U
@@ -27,7 +28,7 @@ export class CubicSolver {
             [1, 8, 5, 10, 1, 0, 4, 7],   // R
         ];
 
-    phase:number;
+    phase:number = 0;
     inputArray:Array;
 
     inverse(move:number) {
@@ -88,123 +89,125 @@ export class CubicSolver {
         return state;
     }
 
-    solve(){
+    swap(array1, array2) {
+        let t = array1;
+        array1 = array2;
+        array2 = t;
+    }
+
+    inverse(move:number) {
+        return move + 2 - 2 * (move % 3);
+    }
+
+    solve() {
         //--- Define the goal.
-        let goal = [ "UF", "UR", "UB", "UL", "DF", "DR", "DB", "DL", "FR", "FL", "BR", "BL",
-            "UFR", "URB", "UBL", "ULF", "DRF", "DFL", "DLB", "DBR" ];
+        let goal = ["UF", "UR", "UB", "UL", "DF", "DR", "DB", "DL", "FR", "FL", "BR", "BL",
+            "UFR", "URB", "UBL", "ULF", "DRF", "DFL", "DLB", "DBR"];
 
         //--- Prepare current (start) and goal state.
         let currentState = [], goalState = [];
-        for( let i=0; i<20; i++ ){
+        for (let i = 0; i < 20; i++) {
 
             //--- Goal state.
             goalState[i] = i;
 
             //--- Current (start) state.
             let cubie = this.inputArray[i];
+            currentState[20+i] = 0;
 
-            let idx = -1;
-            while( idx == -1 ){
-                cubie = cubie.substr( 1 ) + cubie[0];
-                idx =  goal.find(cubie);
-                if(idx == -1){
-                    if(currentState.indexOf(i) == -1)
-                        currentState[i] = 0;
-                    else{
-                        currentState[i]++;
-                    }
-                }
-
+            let idx = goal.indexOf(cubie);
+            while (idx == -1) {
+                currentState[20+i]++;
+                cubie = cubie.substr(1) + cubie[0];
+                idx = goal.indexOf(cubie);
             }
+
+            currentState[i] = idx;
+
         }
 
 
         //--- Dance the funky Thistlethwaite...
-        while( ++this.phase < 5 ){
+        nextPhasePlease:
+            while (++this.phase < 5) {
 
-            //--- Compute ids for current and goal state, skip phase if equal.
-            let currentId = this.id(currentState), goalId = this.id(goalState);
-            if(_.isEqual(currentId, goalId))
-                continue;
+                //--- Compute ids for current and goal state, skip phase if equal.
+                let currentId = this.id(currentState), goalId = this.id(goalState);
+                if (_.isEqual(currentId, goalId))
+                    continue;
 
-            //--- Initialize the BFS queue.
-            let q = [];
-            q.push(currentState);
-            q.push(goalState);
+                //--- Initialize the BFS queue.
+                let q = [];
+                q.push(currentState);
+                q.push(goalState)
 
-            //--- Initialize the BFS tables.
-            let predecessor = [];
-            let direction = [], lastMove = [];
-        //    direction[ currentId ] = 1;
-        //    direction[ goalId ] = 2;
-        //
-        //    //--- Dance the funky bidirectional BFS...
-        //    while( 1 ){
-        //
-        //        //--- Get state from queue, compute its ID and get its direction.
-        //        vi oldState = q.front();
-        //        q.pop();
-        //        vi oldId = id( oldState );
-        //        int& oldDir = direction[oldId];
-        //
-        //        //--- Apply all applicable moves to it and handle the new state.
-        //        for( int move=0; move<18; move++ ){
-        //            if( applicableMoves[phase] & (1 << move) ){
-        //
-        //                //--- Apply the move.
-        //                vi newState = applyMove( move, oldState );
-        //                vi newId = id( newState );
-        //                int& newDir = direction[newId];
-        //
-        //                //--- Have we seen this state (id) from the other direction already?
-        //                //--- I.e. have we found a connection?
-        //                if( newDir  &&  newDir != oldDir ){
-        //
-        //                    //--- Make oldId represent the forwards and newId the backwards search state.
-        //                    if( oldDir > 1 ){
-        //                        swap( newId, oldId );
-        //                        move = inverse( move );
-        //                    }
-        //
-        //                    //--- Reconstruct the connecting algorithm.
-        //                    vi algorithm( 1, move );
-        //                    while( oldId != currentId ){
-        //                        algorithm.insert( algorithm.begin(), lastMove[ oldId ] );
-        //                        oldId = predecessor[ oldId ];
-        //                    }
-        //                    while( newId != goalId ){
-        //                        algorithm.push_back( inverse( lastMove[ newId ] ));
-        //                        newId = predecessor[ newId ];
-        //                    }
-        //
-        //                    //--- Print and apply the algorithm.
-        //                    for( int i=0; i<(int)algorithm.size(); i++ ){
-        //                        cout << "UDFBLR"[algorithm[i]/3] << algorithm[i]%3+1;
-        //                        currentState = applyMove( algorithm[i], currentState );
-        //                    }
-        //
-        //                    //--- Jump to the next phase.
-        //                    goto nextPhasePlease;
-        //                }
-        //
-        //                //--- If we've never seen this state (id) before, visit it.
-        //                if( ! newDir ){
-        //                    q.push( newState );
-        //                    newDir = oldDir;
-        //                    lastMove[ newId ] = move;
-        //                    predecessor[ newId ] = oldId;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    nextPhasePlease:
-        //        ;
-        //}
+                //--- Initialize the BFS tables.
+                let predecessor = [];
+                let direction = [], lastMove = [];
+                direction[currentId] = 1;
+                direction[goalId] = 2;
+
+                //--- Dance the funky bidirectional BFS...
+                while (1) {
+
+                    //--- Get state from queue, compute its ID and get its direction.
+                    let oldState = q.pop();
+                    let oldId = this.id(oldState);
+                    let oldDir = direction[oldId];
+
+                    //--- Apply all applicable moves to it and handle the new state.
+                    for (let move = 0; move < 18; move++) {
+                        if (this.applicableMoves[this.phase] & (1 << move)) {
+
+                            //--- Apply the move.
+                            let newState = this.applyMove(move, oldState);
+                            let newId = this.id(newState);
+                            let newDir = direction[newId];
+
+                            //--- Have we seen this state (id) from the other direction already?
+                            //--- I.e. have we found a connection?
+                            if (newDir && newDir != oldDir) {
+
+                                //--- Make oldId represent the forwards and newId the backwards search state.
+                                if (oldDir > 1) {
+                                    this.swap(newId, oldId);
+                                    move = this.inverse(move);
+                                }
+
+                                //--- Reconstruct the connecting algorithm.
+                                let algorithm = [];
+                                algorithm.push(move);
+                                while (oldId != currentId) {
+                                    algorithm.unshift(lastMove[oldId]);
+                                    oldId = predecessor[oldId];
+                                }
+                                while (newId != goalId) {
+                                    algorithm.push(this.inverse(lastMove[newId]));
+                                    newId = predecessor[newId];
+                                }
+
+                                //--- Print and apply the algorithm.
+                                for (let i = 0; i < algorithm.length; i++) {
+                                    console.log("UDFBLR"[algorithm[i] / 3] + "" + (algorithm[i] % 3 + 1));
+                                    currentState = this.applyMove(algorithm[i], currentState);
+                                }
+
+                                //--- Jump to the next phase.
+                                continue nextPhasePlease;
+                            }
+
+                            //--- If we've never seen this state (id) before, visit it.
+                            if (!newDir) {
+                                q.push(newState);
+                                newDir = oldDir;
+                                lastMove[newId] = move;
+                                predecessor[newId] = oldId;
+                            }
+                        }
+                    }
+                }
+            }
     }
-    }
-
-
-
 
     constructor(inputArray:Array<string>) {
         this.inputArray = inputArray;

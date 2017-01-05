@@ -95,13 +95,11 @@ export class CubeRotater{
     }
 
     removeSelf(){
-        for(let cubesIdx in this.cubes){
-            let cubes = this.cubes[cubesIdx];
-            for(let cubeIdx in cubes){
-                let cube = cubes[cubeIdx];
-                this.scene.remove(cube.getGeometry())
-            }
-        }
+        this.cubes.forEach(function(cubes){
+            cubes.forEach(function(cube){
+              this.scene.remove(cube.getGeometry());
+            })
+        })
     }
 
     initCubes(faces){

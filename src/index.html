@@ -31,10 +31,9 @@
 
                 let colorCount = [];
                 // Check if each face is 9
-                for(let faceIdx in faces){
-                    let face = faces[faceIdx];
+                faces.forEach(function(face){
                     if(face.length == null || face.length != 9 ){
-                        alert("Should input 9 faces in every text input!");
+                        alert("Should input 9 faces in every text input! Wrong face idx:" + faceIdx);
                         return;
                     }
 
@@ -46,14 +45,14 @@
                             colorCount[face]++;
                         }
                     }
-                }
+                })
 
-                for(let colorIdx in colorCount){
-                    if(colorCount[colorIdx] != 9 ){
+                colorCount.forEach(function(colorNumber){
+                    if(colorNumber != 9){
                         alert("Color" + colorIdx + " is wrong");
                         return;
                     }
-                }
+                })
 
                 console.log("Passed basic validation!")
 

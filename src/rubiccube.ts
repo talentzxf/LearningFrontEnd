@@ -1,5 +1,6 @@
 import {Cube} from './cube';
 import {CubeRotater} from './CubeRotater';
+import {CubicSolver} from "./CubicSolver";
 var renderer;
 var scene;
 
@@ -124,6 +125,12 @@ function initCommands(){
         }
     }
 
+    if(!window.solve_cube){
+        window.solve_cube = function(normalizedInput: String){
+            let solver = new CubicSolver(normalizedInput);
+            solver.solve();
+        }
+    }
 }
 
 RubicCube();
