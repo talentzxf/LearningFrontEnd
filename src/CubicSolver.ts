@@ -9,7 +9,7 @@ Array.prototype.subarray = function (start, end) {
     }
 
     let retArray = [];
-    for (let idx = start; idx <= end; idx++) {
+    for (let idx = start; idx < end; idx++) {
         retArray.push(this[idx]);
     }
 
@@ -35,9 +35,10 @@ export class CubicSolver {
         return move + 2 - 2 * (move % 3);
     }
 
-    applyMove(move:number, state:Array<number>) {
+    applyMove(move:number, instate:Array<number>) {
+        let state = _.clone(instate)
         let turns = move % 3 + 1;
-        let face = move / 3;
+        let face = Math.floor(move / 3);
         while (turns--) {
             let oldState = _.clone(state);
             for (let i = 0; i < 8; i++) {
@@ -110,6 +111,7 @@ export class CubicSolver {
 
             //--- Goal state.
             goalState[i] = i;
+            goalState[20+i] = 0;
 
             //--- Current (start) state.
             let cubie = this.inputArray[i];
@@ -151,7 +153,7 @@ export class CubicSolver {
                 while (1) {
 
                     //--- Get state from queue, compute its ID and get its direction.
-                    let oldState = q.pop();
+                    let oldState = q.shift();
                     let oldId = this.id(oldState);
                     let oldDir = direction[oldId];
 
@@ -199,7 +201,7 @@ export class CubicSolver {
                             //--- If we've never seen this state (id) before, visit it.
                             if (!newDir) {
                                 q.push(newState);
-                                newDir = oldDir;
+                                direction[newId] = oldDir;
                                 lastMove[newId] = move;
                                 predecessor[newId] = oldId;
                             }
