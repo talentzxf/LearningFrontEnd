@@ -128,13 +128,13 @@ export class CubicSolver {
                 continue;
 
             //--- Initialize the BFS queue.
-        //    queue<vi> q;
-        //    q.push( currentState );
-        //    q.push( goalState );
-        //
-        //    //--- Initialize the BFS tables.
-        //    map<vi,vi> predecessor;
-        //    map<vi,int> direction, lastMove;
+            let q = [];
+            q.push(currentState);
+            q.push(goalState);
+
+            //--- Initialize the BFS tables.
+            let predecessor = [];
+            let direction = [], lastMove = [];
         //    direction[ currentId ] = 1;
         //    direction[ goalId ] = 2;
         //
