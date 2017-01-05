@@ -113,21 +113,32 @@ export class CubicSolver {
 
             //--- Current (start) state.
             let cubie = this.inputArray[i];
+            currentState[20+i] = 0;
 
-            let idx = -1;
+            let idx = goal.indexOf(cubie);
             while (idx == -1) {
+                currentState[20+i]++;
                 cubie = cubie.substr(1) + cubie[0];
                 idx = goal.indexOf(cubie);
-                if (idx == -1) {
-                    if (currentState.indexOf(i) == -1)
-                        currentState[i + 20] = 0;
-                    else {
-                        currentState[i + 20]++;
-                        currentState[i] = idx;
-                    }
-                }
-
             }
+
+            currentState[i] = idx;
+
+            //let idx = -1;
+            //while (idx == -1) {
+            //
+            //    idx = goal.indexOf(cubie);
+            //    if (idx == -1) {
+            //        if (currentState.indexOf(i) == -1)
+            //            currentState[i + 20] = 0;
+            //        else {
+            //            currentState[i + 20]++;
+            //        }
+            //    }else{
+            //
+            //    }
+            //
+            //}
         }
 
 
