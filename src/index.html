@@ -13,6 +13,45 @@
     <script type="application/javascript" src="./bundle.js"></script>
 
     <script type="application/javascript">
+        function set_cube_color(){
+            let faces = [];
+            faces.push( $("#frontFace").val() );
+            faces.push( $("#leftFace").val() );
+            faces.push( $("#rightFace").val() );
+            faces.push( $("#upFace").val() );
+            faces.push( $("#backFace").val());
+            faces.push( $("#downFace").val() );
+
+            let colorCount = [];
+            // Check if each face is 9
+            faces.forEach(function(face){
+                if(face.length == null || face.length != 9 ){
+                    alert("Should input 9 faces in every text input! Wrong face idx:" + faceIdx);
+                    return;
+                }
+
+                for(let colorIdx = 0 ; colorIdx < face.length; colorIdx++){
+                    let color = face[colorIdx];
+                    if( null == colorCount[face] ){
+                        colorCount[face] = 1;
+                    } else {
+                        colorCount[face]++;
+                    }
+                }
+            })
+
+            colorCount.forEach(function(colorNumber){
+                if(colorNumber != 9){
+                    alert("Color" + colorIdx + " is wrong");
+                    return;
+                }
+            })
+
+            console.log("Passed basic validation!")
+
+            reset_cube_initface(faces);
+        }
+
         $(document).ready(function(){
             $("#submitCubeSeq").click(
                     function(){
@@ -21,42 +60,14 @@
                     }
             )
             $("#setCube").click(function(){
-                let faces = [];
-                faces.push( $("#frontFace").val() );
-                faces.push( $("#leftFace").val() );
-                faces.push( $("#rightFace").val() );
-                faces.push( $("#upFace").val() );
-                faces.push( $("#backFace").val());
-                faces.push( $("#downFace").val() );
+                set_cube_color();
+            })
 
-                let colorCount = [];
-                // Check if each face is 9
-                faces.forEach(function(face){
-                    if(face.length == null || face.length != 9 ){
-                        alert("Should input 9 faces in every text input! Wrong face idx:" + faceIdx);
-                        return;
-                    }
+            $("#solveCube").click(function(){
+                set_cube_color();
+                let solution = solve_cube();
 
-                    for(let colorIdx = 0 ; colorIdx < face.length; colorIdx++){
-                        let color = face[colorIdx];
-                        if( null == colorCount[face] ){
-                            colorCount[face] = 1;
-                        } else {
-                            colorCount[face]++;
-                        }
-                    }
-                })
-
-                colorCount.forEach(function(colorNumber){
-                    if(colorNumber != 9){
-                        alert("Color" + colorIdx + " is wrong");
-                        return;
-                    }
-                })
-
-                console.log("Passed basic validation!")
-
-                reset_cube_initface(faces);
+                $("#cubeSeqText").val(solution);
             })
         })
     </script>
@@ -113,5 +124,6 @@
     </table>
 
     <input type="button" id="setCube" value="SetCubeColor">
+    <input type="button" id="solveCube" value="SetAndSolveCube">
 </body>
 </html>

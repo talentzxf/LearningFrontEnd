@@ -126,9 +126,10 @@ function initCommands(){
     }
 
     if(!window.solve_cube){
-        window.solve_cube = function(normalizedInput: String){
-            let solver = new CubicSolver(normalizedInput);
-            console.log(solver.solve());
+        window.solve_cube = function(){
+            let elemStr = cubeRotater.getElemStr();
+            let solver = new CubicSolver(elemStr.split(" "));
+            return solver.solve();
         }
     }
 }

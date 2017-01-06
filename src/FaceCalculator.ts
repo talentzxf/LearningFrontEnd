@@ -66,6 +66,7 @@ export class FaceCalculator{
     sortedFaceMap: Array = []
     centerColors:Array = [];
     f2c:Array = [];
+    elemStr:String = "";
 
     C2F(c){
         return this.centerColors[c];
@@ -131,7 +132,8 @@ export class FaceCalculator{
                 retStr += this.faceMap[faceIdx] + " ";
             }
         }
-        console.log("20-elements input format is:" + retStr);
+        // console.log("20-elements input format is:" + retStr);
+        this.elemStr = retStr;
 
         // Init sorted face map for future lookup
         for(let faceIdx in this.faceMap){
@@ -148,6 +150,10 @@ export class FaceCalculator{
         this.sortedFaceMap['D'] = 'D';
 
         this.inited = true;
+    }
+
+    getElemStr(){
+        return this.elemStr;
     }
 
     colorCube(cube:Cube){

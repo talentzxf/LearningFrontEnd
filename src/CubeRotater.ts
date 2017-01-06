@@ -17,7 +17,7 @@ export class CubeRotater{
     cubes = [];
     angle = 0;
     rotating = false;
-    speed = 0.01;
+    speed = 0.1;
 
     faceIndexArray = ["F","R","L","D","U","B"];
 
@@ -180,6 +180,11 @@ export class CubeRotater{
             }
         }
 
+    }
+
+    getElemStr(){
+        if(this.faceCalculator != null)
+            return this.faceCalculator.getElemStr();
     }
 
     constructor(scene, faces){
