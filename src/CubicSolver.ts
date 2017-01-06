@@ -98,6 +98,7 @@ export class CubicSolver {
         //--- Define the goal.
         let goal = ["UF", "UR", "UB", "UL", "DF", "DR", "DB", "DL", "FR", "FL", "BR", "BL",
             "UFR", "URB", "UBL", "ULF", "DRF", "DFL", "DLB", "DBR"];
+        let result = "";
 
         //--- Prepare current (start) and goal state.
         let currentState = [], goalState = [];
@@ -188,7 +189,8 @@ export class CubicSolver {
                                 //--- Print and apply the algorithm.
                                 for (let i = 0; i < algorithm.length; i++) {
                                     let curMove = Math.floor(algorithm[i] / 3);
-                                    console.log("UDFBLR"[curMove] + "" + (algorithm[i] % 3 + 1));
+                                    // console.log("UDFBLR"[curMove] + "" + (algorithm[i] % 3 + 1));
+                                    result += "UDFBLR"[curMove] + "" + (algorithm[i] % 3 + 1);
                                     currentState = this.applyMove(algorithm[i], currentState);
                                 }
 
@@ -207,6 +209,8 @@ export class CubicSolver {
                     }
                 }
             }
+
+        return result;
     }
 
     constructor(inputArray:Array<string>) {

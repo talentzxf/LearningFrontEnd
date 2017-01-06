@@ -128,7 +128,7 @@ function initCommands(){
     if(!window.solve_cube){
         window.solve_cube = function(normalizedInput: String){
             let solver = new CubicSolver(normalizedInput);
-            solver.solve();
+            console.log(solver.solve());
         }
     }
 }

@@ -17,7 +17,7 @@ export class CubeRotater{
     cubes = [];
     angle = 0;
     rotating = false;
-    speed = 0.5;
+    speed = 0.01;
 
     faceIndexArray = ["F","R","L","D","U","B"];
 
@@ -95,11 +95,25 @@ export class CubeRotater{
     }
 
     removeSelf(){
-        this.cubes.forEach(function(cubes){
-            cubes.forEach(function(cube){
-              this.scene.remove(cube.getGeometry());
-            })
-        })
+        //this.cubes.forEach(function(cubes){
+        //    cubes.forEach(function(cube){
+        //      this.scene.remove(cube.getGeometry());
+        //    })
+        //})
+
+        for(let idx in this.cubes){
+            if(!this.cubes.hasOwnProperty(idx)){
+                continue;
+            }
+            let cubes = this.cubes[idx];
+            for(let cIdx in cubes){
+                if(!cubes.hasOwnProperty(cIdx)){
+                    continue;
+                }
+                let cube = cubes[cIdx];
+                this.scene.remove(cube.getGeometry());
+            }
+        }
     }
 
     initCubes(faces){
@@ -179,9 +193,8 @@ export class CubeRotater{
     update(){
         if(this.rotating){
             let childArray = this.cubes[this.rotatingFace];
-            for(let idx in childArray){
+            for(let idx = 0; idx < childArray.length; idx++){
                 let cube = childArray[idx];
-                // console.log("Rotating:" + cube.getOriginTags());
                 let obj = cube.getGeometry();
                 obj.rotateAroundWorldAxis(this.rotateAxis, this.speed);
             }
@@ -192,9 +205,8 @@ export class CubeRotater{
                 let errorAngle = Math.PI/2 - this.angle;
                 console.log("Fixing angle:" + errorAngle);
                 let childArray = this.cubes[this.rotatingFace];
-                for(let idx in childArray){
+                for(let idx = 0; idx < childArray.length ; idx++){
                     let cube = childArray[idx];
-                    // console.log("Rotating:" + cube.getOriginTags());
                     let obj = cube.getGeometry();
                     obj.rotateAroundWorldAxis(this.rotateAxis, errorAngle);
                 }
@@ -202,11 +214,12 @@ export class CubeRotater{
                 this.angle = 0;
 
                 // Move from one face to another
-                for( let idx in childArray ){
+                for( let idx = 0; idx < childArray.length; idx++ ){
                     let cube = childArray[idx];
                     let tags = cube.getTags();
-                    for(let tagIdx in tags){
+                    for(let tagIdx = 0 ; tagIdx < tags.length; tagIdx++){
                         let tag = tags[tagIdx];
+
                         if(this.faceRotateMap[this.rotatingFace][tag] != null){
                             if(this.rotateCW){
                                 cube.setTag(tagIdx, this.faceRotateMap[this.rotatingFace][tag]);
@@ -221,11 +234,14 @@ export class CubeRotater{
                 }
 
                 // Reconsolidate all cubes according to tag
-                for( let idx in childArray ){
+                for( let idx = 0 ; idx < childArray.length; idx++ ){
                     let cube = childArray[idx];
+
                     let tags = cube.getTags();
-                    for(let tagIdx in tags){
+
+                    for(let tagIdx = 0; tagIdx < tags.length; tagIdx++){
                         let tag = tags[tagIdx];
+
                         if(this.faceRotateMap[this.rotatingFace][tag] != null)
                             this.cubes[tag].push(cube);
                     }
