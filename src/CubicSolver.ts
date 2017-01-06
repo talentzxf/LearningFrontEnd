@@ -90,12 +90,6 @@ export class CubicSolver {
         return state;
     }
 
-    swap(array1, array2) {
-        let t = array1;
-        array1 = array2;
-        array2 = t;
-    }
-
     inverse(move:number) {
         return move + 2 - 2 * (move % 3);
     }
@@ -172,25 +166,29 @@ export class CubicSolver {
 
                                 //--- Make oldId represent the forwards and newId the backwards search state.
                                 if (oldDir > 1) {
-                                    this.swap(newId, oldId);
+                                    let t = newId;
+                                    newId = oldId;
+                                    oldId = t;
+
                                     move = this.inverse(move);
                                 }
 
                                 //--- Reconstruct the connecting algorithm.
                                 let algorithm = [];
                                 algorithm.push(move);
-                                while (oldId != currentId) {
+                                while (!_.isEqual(oldId,currentId)) {
                                     algorithm.unshift(lastMove[oldId]);
                                     oldId = predecessor[oldId];
                                 }
-                                while (newId != goalId) {
+                                while(!_.isEqual(newId, goalId)){
                                     algorithm.push(this.inverse(lastMove[newId]));
                                     newId = predecessor[newId];
                                 }
 
                                 //--- Print and apply the algorithm.
                                 for (let i = 0; i < algorithm.length; i++) {
-                                    console.log("UDFBLR"[algorithm[i] / 3] + "" + (algorithm[i] % 3 + 1));
+                                    let curMove = Math.floor(algorithm[i] / 3);
+                                    console.log("UDFBLR"[curMove] + "" + (algorithm[i] % 3 + 1));
                                     currentState = this.applyMove(algorithm[i], currentState);
                                 }
 
