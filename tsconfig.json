@@ -1,8 +1,5 @@
 {
   "files": [
-    "src/main.ts",
-    "src/greet.ts",
-    "src/rubiccube.ts",
     "src/*.ts"
   ],
   "compilerOptions": {

@@ -1,6 +1,7 @@
 import {Cube} from './cube';
 import {CubeRotater} from './CubeRotater';
 import {CubicSolver} from "./CubicSolver";
+import {CameraImgPicker} from "./CameraImgPicker"
 var renderer;
 var scene;
 
@@ -9,6 +10,7 @@ var cubeRotater;
 function init3DRenderer(scene:THREE.Scene, borderLength:number){
     renderer = new THREE.WebGLRenderer({ antialias: true } );
     var camera = new THREE.PerspectiveCamera( 40, 1.0, 0.1, 1000 );
+    camera.position.z = 30;
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( borderLength, borderLength);
     document.body.appendChild( renderer.domElement );

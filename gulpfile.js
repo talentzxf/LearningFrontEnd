@@ -16,15 +16,28 @@ var watchedBrowserify = watchify(browserify({
     packageCache: {}
 }).plugin(tsify));
 
+var watchedImgProcessingBrowserify = watchify(browserify({
+    basedir: '.',
+    debug: true,
+    entries: ['src/CameraImgPicker.ts'],
+    cache: {},
+    packageCache: {}
+}).plugin(tsify));
+
 gulp.task("copy-html", function () {
     return gulp.src(paths.pages)
         .pipe(gulp.dest("dst"));
 });
 
 function bundle() {
-    return watchedBrowserify
+    watchedBrowserify
         .bundle()
         .pipe(source('bundle.js'))
+        .pipe(gulp.dest("dst"));
+
+    watchedImgProcessingBrowserify
+        .bundle()
+        .pipe(source('img.js'))
         .pipe(gulp.dest("dst"));
 }
 

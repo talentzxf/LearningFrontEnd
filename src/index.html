@@ -1,129 +1,133 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Hello World!</title>
     <script src="../lib/jquery-3.1.1.min.js"></script>
     <script src="../lib/three.min.js"></script>
     <script src="../lib/underscore-min.js"></script>
     <script src="../lib/js/controls/OrbitControls.js"></script>
-    </head>
+</head>
 <body>
 
-    <script type="application/javascript" src="./bundle.js"></script>
+<script type="application/javascript" src="./bundle.js"></script>
 
-    <script type="application/javascript">
-        function set_cube_color(){
-            let faces = [];
-            faces.push( $("#frontFace").val() );
-            faces.push( $("#leftFace").val() );
-            faces.push( $("#rightFace").val() );
-            faces.push( $("#upFace").val() );
-            faces.push( $("#backFace").val());
-            faces.push( $("#downFace").val() );
+<script type="application/javascript">
+    function set_cube_color() {
+        let faces = [];
+        faces.push($("#frontFace").val());
+        faces.push($("#leftFace").val());
+        faces.push($("#rightFace").val());
+        faces.push($("#upFace").val());
+        faces.push($("#backFace").val());
+        faces.push($("#downFace").val());
 
-            let colorCount = [];
-            // Check if each face is 9
-            faces.forEach(function(face){
-                if(face.length == null || face.length != 9 ){
-                    alert("Should input 9 faces in every text input! Wrong face idx:" + faceIdx);
-                    return;
+        let colorCount = [];
+        // Check if each face is 9
+        faces.forEach(function (face) {
+            if (face.length == null || face.length != 9) {
+                alert("Should input 9 faces in every text input! Wrong face idx:" + faceIdx);
+                return;
+            }
+
+            for (let colorIdx = 0; colorIdx < face.length; colorIdx++) {
+                let color = face[colorIdx];
+                if (null == colorCount[face]) {
+                    colorCount[face] = 1;
+                } else {
+                    colorCount[face]++;
                 }
-
-                for(let colorIdx = 0 ; colorIdx < face.length; colorIdx++){
-                    let color = face[colorIdx];
-                    if( null == colorCount[face] ){
-                        colorCount[face] = 1;
-                    } else {
-                        colorCount[face]++;
-                    }
-                }
-            })
-
-            colorCount.forEach(function(colorNumber){
-                if(colorNumber != 9){
-                    alert("Color" + colorIdx + " is wrong");
-                    return;
-                }
-            })
-
-            console.log("Passed basic validation!")
-
-            reset_cube_initface(faces);
-        }
-
-        $(document).ready(function(){
-            $("#submitCubeSeq").click(
-                    function(){
-                        let commands = $("#cubeSeqText").val()
-                        buffer_commands(commands);
-                    }
-            )
-            $("#setCube").click(function(){
-                set_cube_color();
-            })
-
-            $("#solveCube").click(function(){
-                set_cube_color();
-                let solution = solve_cube();
-
-                $("#cubeSeqText").val(solution);
-            })
+            }
         })
-    </script>
+
+        colorCount.forEach(function (colorNumber) {
+            if (colorNumber != 9) {
+                alert("Color" + colorIdx + " is wrong");
+                return;
+            }
+        })
+
+        console.log("Passed basic validation!")
+
+        reset_cube_initface(faces);
+    }
+
+    $(document).ready(function () {
+        $("#submitCubeSeq").click(
+                function () {
+                    let commands = $("#cubeSeqText").val()
+                    buffer_commands(commands);
+                }
+        )
+        $("#setCube").click(function () {
+            set_cube_color();
+        })
+
+        $("#solveCube").click(function () {
+            set_cube_color();
+            let solution = solve_cube();
+
+            $("#cubeSeqText").val(solution);
+        })
+
+        $("#frontFaceCamera").click(function () {
+            var smallWindow = window.open("./pickup.html","_blank","width=500,height=500");
+        })
+    })
+</script>
 
 
+<!--<input type="button" name="L" value="L" onclick="input_command('L')">-->
+<!--<input type="button" name="R" value="R" onclick="input_command('R')">-->
+<!--<input type="button" name="U" value="U" onclick="input_command('U')">-->
+<!--<input type="button" name="D" value="D" onclick="input_command('D')">-->
+<!--<input type="button" name="F" value="F" onclick="input_command('F')">-->
+<!--<input type="button" name="B" value="B" onclick="input_command('B')">-->
 
-    <!--<input type="button" name="L" value="L" onclick="input_command('L')">-->
-    <!--<input type="button" name="R" value="R" onclick="input_command('R')">-->
-    <!--<input type="button" name="U" value="U" onclick="input_command('U')">-->
-    <!--<input type="button" name="D" value="D" onclick="input_command('D')">-->
-    <!--<input type="button" name="F" value="F" onclick="input_command('F')">-->
-    <!--<input type="button" name="B" value="B" onclick="input_command('B')">-->
+<input id="cubeSeqText" type="text">
+<input id="submitCubeSeq" type="button" name="Submit" value="OK">
 
-    <input id="cubeSeqText" type="text" >
-    <input id="submitCubeSeq" type="button" name="Submit" value="OK">
+<input type="button" name="RandomRotate" value="ToggleRandom" onclick="toggle_random()">
+<input type="button" name="ResetCube" value="ResetCube" onclick="reset_cube()">
 
-    <input type="button" name="RandomRotate" value="ToggleRandom" onclick="toggle_random()">
-    <input type="button" name="ResetCube" value="ResetCube" onclick="reset_cube()">
-
-    <!-- Input color window -->
-    <table>
-        <th>
-            <tr>
-                <td>index</td>
-                <td> color sequence</td>
-            </tr>
-        </th>
-        <tbody>
+<!-- Input color window -->
+<table>
+    <th>
         <tr>
-            <td>Front face</td>
-            <td><input type="text" value="BOYOBBROW" id="frontFace"></td>
+            <td>index</td>
+            <td> color sequence</td>
         </tr>
-        <tr>
-            <td>Left face</td>
-            <td><input type="text" value="ORRGOYWRY" id="leftFace"></td>
-        </tr>
-        <tr>
-            <td>Right face</td>
-            <td><input type="text" value="RBORROOWG" id="rightFace"></td>
-        </tr>
-        <tr>
-            <td>Up face</td>
-            <td><input type="text" value="BGGGYYWBG" id="upFace"></td>
-        </tr>
-        <tr>
-            <td>Back face</td>
-            <td><input type="text" value="YYYWGWOWG" id="backFace"></td>
-        </tr>
-        <tr>
-            <td>Down face</td>
-            <td><input type="text" value="BGBYWBRRW" id="downFace"></td>
-        </tr>
-        </tbody>
-    </table>
+    </th>
+    <tbody>
+    <tr>
+        <td>Front face</td>
+        <td><input type="text" value="BOYOBBROW" id="frontFace"></td>
+        <td><input type="button" value="PickupThroughCamera" id="frontFaceCamera"></td>
+    </tr>
+    <tr>
+        <td>Left face</td>
+        <td><input type="text" value="ORRGOYWRY" id="leftFace"></td>
+    </tr>
+    <tr>
+        <td>Right face</td>
+        <td><input type="text" value="RBORROOWG" id="rightFace"></td>
+    </tr>
+    <tr>
+        <td>Up face</td>
+        <td><input type="text" value="BGGGYYWBG" id="upFace"></td>
+    </tr>
+    <tr>
+        <td>Back face</td>
+        <td><input type="text" value="YYYWGWOWG" id="backFace"></td>
+    </tr>
+    <tr>
+        <td>Down face</td>
+        <td><input type="text" value="BGBYWBRRW" id="downFace"></td>
+    </tr>
+    </tbody>
+</table>
 
-    <input type="button" id="setCube" value="SetCubeColor">
-    <input type="button" id="solveCube" value="SetAndSolveCube">
+<input type="button" id="setCube" value="SetCubeColor">
+<input type="button" id="solveCube" value="SetAndSolveCube">
 </body>
 </html>

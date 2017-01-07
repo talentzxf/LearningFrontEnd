@@ -1,0 +1,55 @@
+<html>
+<head>
+    <script src="../lib/jquery-3.1.1.min.js"></script>
+    <script src="../lib/three.min.js"></script>
+    <script src="../lib/underscore-min.js"></script>
+    <script type="application/javascript" src="./img.js"></script>
+
+    <script type="application/javascript">
+        console.log("Begin 1!!")
+        $(document).ready(function(){
+            console.log("Begin!!")
+            var video = document.querySelector("#videoElement");
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+
+            renderCanvas = function () {
+                requestAnimationFrame(renderCanvas);
+                context.drawImage(video, 0, 0, 640, 480);
+
+                var data = context.getImageData(0, 0, 640, 480).data;
+
+                window.createImgPicker(data, 640, 480).process();
+
+            };
+
+            renderCanvas();
+
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia({video: true}, handleVideo, videoError);
+            }
+
+            function handleVideo(stream) {
+                video.src = window.URL.createObjectURL(stream);
+            }
+
+            function videoError(e) {
+                // do something
+            }
+        })
+
+
+    </script>
+</head>
+<body>
+    Scan the cube here:
+    <div id="container">
+        <video autoplay="true" id="videoElement" border="5px">
+        </video>
+        <canvas id="canvas" width="640" height="480" border="5px"></canvas>
+    </div>
+
+</body>
+</html>

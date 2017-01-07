@@ -17,7 +17,7 @@ export class CubeRotater{
     cubes = [];
     angle = 0;
     rotating = false;
-    speed = 0.1;
+    speed = 0.2;
 
     faceIndexArray = ["F","R","L","D","U","B"];
 
