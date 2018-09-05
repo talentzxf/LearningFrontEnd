@@ -10,10 +10,12 @@
 
     <input type="button" value="pause/resume" @click="pauseResumeToggle()"> <br>
 
-    cX<input v-model="cX" >
-    cY<input v-model="cY" >
-    scale<input v-model="scale" >
+    cX<input v-model="cX">
+    cY<input v-model="cY">
+    scale<input v-model="scale">
 
+    {{mousePoint[0]/800}},{{mousePoint[1]/800}} <br>
+    {{elapsedTime}}
     <div id="glmaincanvas"></div>
   </div>
 </template>
@@ -24,25 +26,27 @@
     data() {
       return {
         msg: 'Welcome to Your Vue.js App',
-        cX: -0.5,
-        cY: -0.5,
+        cX: 0,
+        cY: 0,
         scale: 3.0,
         pause: false,
         pauseTime: 0.0,
         iterateCount: 100,
+        mousePoint: [0, 0],
+        elapsedTime: -1,
       };
     },
-    methods:{
-      adjust(deltaX, deltaY){
+    methods: {
+      adjust(deltaX, deltaY) {
         this.cX += deltaX
         this.cY += deltaY
       },
 
-      zoom(zoomFactor){
+      zoom(zoomFactor) {
         this.scale *= zoomFactor
       },
 
-      pauseResumeToggle(){
+      pauseResumeToggle() {
         this.pause = !this.pause
         var GL = require("litegl")
         var getTime = GL.utils.getTime
@@ -59,34 +63,15 @@
       document.getElementById("glmaincanvas").appendChild(gl.canvas)
       gl.animate();
       gl.captureMouse();
-      var pos = [0,0];
-      //build the mesh
-      var texture = GL.Texture.fromURL("/static/texture.png",{temp_color:[80,120,40,255], minFilter: gl.LINEAR_MIPMAP_LINEAR});
-      // //basic distort shader
-      // var shader = new Shader( Shader.SCREEN_VERTEX_SHADER, "\
-		// 	precision highp float;\n\
-		// 	uniform sampler2D texture;\n\
-		// 	uniform float u_time;\n\
-		// 	uniform vec2 u_mousepos;\n\
-		// 	varying vec2 v_coord;\n\
-		// 	void main() {\n\
-		// 		vec2 n = (v_coord - u_mousepos);\n\
-		// 		float l = length(n);\n\
-		// 		n /= l;\n\
-		// 		vec2 uv = v_coord - n * 0.1;\n\
-		// 		gl_FragColor = texture2D(texture, uv);\n\
-		// 	}\n\
-		// ");
-
       // Mandelbrot shader
-
-      var shader = new Shader( Shader.SCREEN_VERTEX_SHADER, "\
+      var shader = new Shader(Shader.SCREEN_VERTEX_SHADER, "\
       	precision highp float;\n\
       	varying vec2 v_coord;\n\
       	uniform float u_time;\n\
       	uniform float cX;\n\
       	uniform float cY;\n\
       	uniform float scale;\n\
+      	uniform vec2 u_mousepos;\n\
       	vec2 complex_multi(vec2 a, vec2 b){\n\
       	return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);\n\
       	}\n\
@@ -109,26 +94,41 @@
     }\n\
     void main() {\n\
           vec2 c = vec2(cX,cY);\n\
-      		gl_FragColor = vec4(0.0,iterate_count((v_coord+c)*scale, 30.0)/30.0,\n\
+          if( length( v_coord - u_mousepos ) < 0.01 ){\n\
+          gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
+          }else{\n\
+      		gl_FragColor = vec4(0.0,iterate_count((v_coord + c + vec2(-0.5,-0.5) )*scale, 30.0)/30.0,\n\
       		0.0,1.0);\n\
+      		}\n\
       	}\n\
       ");
 
       var _this = this
-      gl.ondraw = function(){
-        shader.toViewport({
-          u_time : _this.pause?(_this.pauseTime%10000)*0.0005:(getTime()%10000)*0.0005,
-          cX : _this.cX,
-          cY : _this.cY,
-          scale: _this.scale,
-        });
+      gl.ondraw = function () {
+        _this.elapsedTime = _this.pause ? (_this.pauseTime % 10000) * 0.0005 : (getTime() % 10000) * 0.0005,
+          shader.toViewport({
+            u_time: _this.elapsedTime,
+            cX: _this.cX,
+            cY: _this.cY,
+            scale: _this.scale,
+            u_mousepos: [_this.mousePoint[0] / gl.canvas.width, _this.mousePoint[1] / gl.canvas.height]
+          });
       }
 
-      gl.onmousemove = function(e)
-      {
-        pos[0] = e.canvasx;
-        pos[1] = e.canvasy;
+      gl.onmousemove = function (e) {
+        _this.mousePoint[0] = e.canvasx;
+        _this.mousePoint[1] = e.canvasy;
+        console.log("Mouse move")
       }
+
+      gl.onmousedown = function (e) {
+        _this.cX = e.canvasx / gl.canvas.width + _this.cX - 0.5
+        _this.cY = e.canvasy / gl.canvas.height + _this.cY - 0.5
+        _this.scale = _this.scale * 0.99
+        console.log("onClick")
+      }
+
+      gl.captureKeys();
     },
   };
 </script>
