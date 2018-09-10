@@ -28,7 +28,7 @@
         msg: 'Welcome to Your Vue.js App',
         cX: 0,
         cY: 0,
-        scale: 3.0,
+        scale: 1.0,
         pause: false,
         pauseTime: 0.0,
         iterateCount: 100,
@@ -122,9 +122,9 @@
       }
 
       gl.onmousedown = function (e) {
-        _this.cX = e.canvasx / gl.canvas.width + _this.cX - 0.5
-        _this.cY = e.canvasy / gl.canvas.height + _this.cY - 0.5
-        _this.scale = _this.scale * 0.99
+        _this.cX = e.canvasx / gl.canvas.width + _this.cX - 0.4
+        _this.cY = e.canvasy / gl.canvas.height + _this.cY - 0.4
+
         console.log("onClick")
       }
 
