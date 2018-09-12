@@ -9,15 +9,14 @@
       </template>
     </div>
 
-    <canvas id="maincanvas" style="width:500px; height: 500px;border:1px solid red">
+    <canvas id="maincanvas" width="500px" height="500px" style="border:1px solid red">
     </canvas>
 
   </div>
 </template>
 <script>
-  import {calculatorGramma} from "./lib/calculator_gramma"
+  import {parser} from "./lib/calculator_gramma"
   import {CanvasDrawer} from "./lib/CanvasDrawer"
-  import {Parser} from "jison"
 
   export default {
     name: "FuncDrawer",
@@ -26,7 +25,7 @@
         result: "NaN",
         formula: "Input formula here",
         bindingVariables: {},
-        parser: new Parser(calculatorGramma),
+        parser: parser,
         canvasDrawer: null,
       }
     },
@@ -39,7 +38,7 @@
         this.recalculate()
       },
       recalculate: function () {
-        this.parser.yy = {variables: this.bindingVariables}
+        this.parser.yy.variables = this.bindingVariables
         this.result = this.parser.parse(this.formula)
 
         this.redrawCanvas()
