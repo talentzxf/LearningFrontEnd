@@ -58,7 +58,7 @@ class Complex {
 
   toString() {
     if (this.img == 0)
-      return this.real
+      return this.real.toString()
 
     if (this.real == 0) {
       return this.img + "i";
@@ -70,12 +70,20 @@ class Complex {
       return this.real + "" + (this.img == -1 ? "-" : this.img) + "i"
   }
 
+  equals(other) {
+    if (Math.abs(this.real - other.real ) < Complex.EPS && Math.abs( this.img - other.img) < Complex.EPS) {
+      return true;
+    }
+
+    return false;
+  }
+
   static fromLengthAndAngel(length, angel) {
     return new Complex(length * Math.cos(angel), length * Math.sin(angel))
   }
 
   static fromString(val) {
-    var numberRE = /([0-9]*)\+([0-9]*)i/
+    var numberRE = /([0-9\.]+)\+([0-9\.]*)i/
 
     var match1 = val.match(numberRE)
     if (match1) {
@@ -84,21 +92,22 @@ class Complex {
       return new Complex(Number(firstPart), Number(secondPart))
     }
 
-    var pureRealRE = /([0-9]*)/
+    var pureImgRE = /([0-9\.]+)i/
+    var match3 = val.match(pureImgRE)
+    if (match3) {
+      return new Complex(0, Number(match3[1]))
+    }
+
+    var pureRealRE = /([0-9\.]+)/
     var match2 = val.match(pureRealRE)
     if (match2) {
       return new Complex(Number(match2[1]), 0)
     }
 
-    var pureImgRE = /([0-9]*)i/
-    var match3 = val.match(pureRealRE)
-    if (match3) {
-      return new Complex(0, Number(match3[1]))
-    }
-
     throw "Can't parse variable"
   }
-
 }
+
+Complex.EPS = 0.000001
 
 export {Complex}
