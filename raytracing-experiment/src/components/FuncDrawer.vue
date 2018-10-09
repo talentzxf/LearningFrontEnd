@@ -1,4 +1,5 @@
 <template>
+  <!-- After I found this is similar to wolfram.com, this project seems not so interesting now. -->
   <div>
     <input v-model="formula"/>
     == {{result}}

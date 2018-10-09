@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import HelloWorld from '@/components/HelloWorld';
 import IndexPage from '@/components/IndexPage';
 import FuncDrawer from '@/components/FuncDrawer';
+import InvertedPendulum from '@/components/InvertedPendulum';
 
 Vue.use(Router);
 
@@ -22,6 +23,11 @@ export default new Router({
       path:"/func",
       name:"FuncDrawer",
       component: FuncDrawer
+    },
+    {
+      path:"/invertedpendulum",
+      name:"InvertedPendulum",
+      component: InvertedPendulum
     }
   ],
 });
