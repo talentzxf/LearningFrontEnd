@@ -2,7 +2,7 @@ import {Complex} from "./Complex"
 import {Parser} from "jison"
 
 var complex = new Complex(100, 100)
-console.log(complex.toString())
+// console.log(complex.toString())
 
 var calculatorGramma = {
   "comment": "JSON Math Parser",
@@ -73,7 +73,7 @@ var calculatorGramma = {
 
 var parser = new Parser(calculatorGramma)
 
-console.log(parser)
+// console.log(parser)
 
 parser.yy.Complex = Complex
 

@@ -23,7 +23,7 @@
 <script>
   export default {
     name: 'HelloWorld',
-    data() {
+    data: function(){
       return {
         msg: 'Welcome to Your Vue.js App',
         cX: 0,

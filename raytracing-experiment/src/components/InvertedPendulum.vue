@@ -1,23 +1,39 @@
 <template>
-
+<div>
+</div>
 </template>
 
 <script>
     export default {
         name: "InvertedPendulum",
-        mounted: function(){
-          var scene = new THREE.Scene();
-          var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        data: function(){
+          return {
+            renderer: new THREE.WebGLRenderer(),
+            scene: new THREE.Scene(),
+            camera: null,
+            cube: null
+          }
+        },
+        methods: {
+          animate: function(){
+            requestAnimationFrame(this.animate)
+            this.renderer.render(this.scene, this.camera)
+            this.cube.rotation.x += 0.01;
+            this.cube.rotation.y += 0.01;
+          }
+        },
+        mounted: function ()  {
+          this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
           var geometry = new THREE.BoxGeometry( 1, 1, 1 );
           var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-          var cube = new THREE.Mesh( geometry, material );
-          scene.add( cube );
+          this.cube = new THREE.Mesh( geometry, material );
+          this.scene.add( this.cube );
 
-          camera.position.z = 5;
-          var renderer = new THREE.WebGLRenderer();
-          renderer.setSize( window.innerWidth, window.innerHeight );
-          document.body.appendChild( renderer.domElement );
+          this.camera.position.z = 5;
+          this.renderer.setSize( window.innerWidth, window.innerHeight );
+          document.body.appendChild( this.renderer.domElement );
+          this.animate()
         }
     }
 </script>

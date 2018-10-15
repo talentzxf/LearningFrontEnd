@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld';
 import IndexPage from '@/components/IndexPage';
 import FuncDrawer from '@/components/FuncDrawer';
 import InvertedPendulum from '@/components/InvertedPendulum';
+import Suduko from '@/components/Suduko';
 
 Vue.use(Router);
 
@@ -25,9 +26,14 @@ export default new Router({
       component: FuncDrawer
     },
     {
-      path:"/invertedpendulum",
+      path:"/ipendulum",
       name:"InvertedPendulum",
       component: InvertedPendulum
+    },
+    {
+      path:"/suduko",
+      name:"Suduko",
+      component: Suduko
     }
   ],
 });
