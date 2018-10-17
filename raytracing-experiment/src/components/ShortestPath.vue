@@ -1,29 +1,35 @@
 <template>
-  <div style="width:100%;display:flex;justify-content:center">
-    Shortest Path:
-    Start: {{start}}
-    End: {{end}}
+  <div style="width:100%">
+    <div>
+      Shortest Path:
+      Start: {{start}}
+      End: {{end}}
+      MinDistance: {{distance}}
+    </div>
 
-    <table id="sudukoTable" style="border: 1px solid red;">
-      <tr v-for="(row,row_id) in matrix">
-        <td v-for="(column, column_id) in matrix[row_id]">
-          <template v-if="row_id==start[0] && column_id == start[1]">
-            <span style="color:green; font-weight:bold">Start</span>
-          </template>
-          <template v-else-if="row_id==end[0] && column_id == end[1]">
-            <span style="color:red; font-weight:bold">End</span>
-          </template>
-          <template v-else>
-            <template v-if="path != null && path.has(row_id+'_'+column_id)">
-              <span style="color:red"> {{ matrix[row_id][column_id] == true? '1':'0' }} </span>
+    <div>
+      <table id="sudukoTable" style="border: 1px solid red;">
+        <tr v-for="(row,row_id) in matrix">
+          <td v-for="(column, column_id) in matrix[row_id]">
+            <template v-if="row_id==start[0] && column_id == start[1]">
+              <span style="color:green; font-weight:bold">Start</span>
+            </template>
+            <template v-else-if="row_id==end[0] && column_id == end[1]">
+              <span style="color:red; font-weight:bold">End</span>
             </template>
             <template v-else>
-              <span> {{ matrix[row_id][column_id] == true? '1':'0' }} </span>
+              <template v-if="path != null && path.has(row_id+'_'+column_id)">
+                <span style="color:red"> {{ matrix[row_id][column_id] == true? '1':'0' }} </span>
+              </template>
+              <template v-else>
+                <span> {{ matrix[row_id][column_id] == true? '1':'0' }} </span>
+              </template>
             </template>
-          </template>
-        </td>
-      </tr>
-    </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+
   </div>
 </template>
 <script>
@@ -39,7 +45,8 @@
         matrix: [],
         start: [0, 0],  // row, column
         end: [height - 1, width - 1],
-        path: new Set()
+        path: new Set(),
+        distance: Number.POSITIVE_INFINITY
       }
 
       for (var i = 0; i < height; i++) {
@@ -51,15 +58,20 @@
 
       // Mark start and end points passable
       retValue.matrix[0][0] = false
-      retValue.matrix[height-1][width-1] = false
+      retValue.matrix[height - 1][width - 1] = false
 
       return retValue
     },
     mounted: function () {
       console.log(this.matrix)
-      var pathFinder = new PathFinder(this.matrix, this.start, this.end)
-      this.path = pathFinder.findShortestPath()
-      console.log(this.path)
+      var pathFinder = new PathFinder(this.matrix);
+      console.log(pathFinder);
+      var pathResult = pathFinder.findShortestPath(this.start, this.end);
+      this.path = pathResult.path
+      this.distance = pathResult.minDist
+      console.log(this.path);
+
+      console.log(pathFinder.findShortestPathWithHammer(this.start, this.end, 1))
     }
   }
 </script>
