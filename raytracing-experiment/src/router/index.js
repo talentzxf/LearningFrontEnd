@@ -5,6 +5,7 @@ import IndexPage from '@/components/IndexPage';
 import FuncDrawer from '@/components/FuncDrawer';
 import InvertedPendulum from '@/components/InvertedPendulum';
 import Suduko from '@/components/Suduko';
+import ShortestPath from '@/components/ShortestPath'
 
 Vue.use(Router);
 
@@ -34,6 +35,11 @@ export default new Router({
       path:"/suduko",
       name:"Suduko",
       component: Suduko
+    },
+    {
+      path:"/shortestpath",
+      name: "ShortestPath",
+      component: ShortestPath
     }
   ],
 });

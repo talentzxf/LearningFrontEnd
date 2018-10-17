@@ -28,7 +28,7 @@
         height: 9,
         raw_rows: [],
         knownElementCount: 0,
-        complexity: 1,
+        complexity: 0,
         rows: [
           [null, null, 5, 3, null, null, null, null, null],
           [8, null, null, null, null, null, null, 2, null],
@@ -84,11 +84,28 @@
           }
         }
       },
+      checkEqual(rowNumber, colNumber, inMatrix, itemValue) {
+        if (inMatrix[rowNumber][colNumber] === null) {
+          return false
+        }
 
+        var matrixValue = null;
+        if (typeof(inMatrix[rowNumber][colNumber]) === "number") {
+          matrixValue = inMatrix[rowNumber][colNumber]
+        } else if (inMatrix[rowNumber][colNumber].length == 1) {
+          matrixValue = inMatrix[rowNumber][colNumber][0]
+        }
+
+        return matrixValue === itemValue
+      },
       deleteItemFromRow: function (rowNumber, colNumber, inMatrix, itemValue) {
         var somethingChanged = false;
         for (var j = 0; j < this.width; j++) {
           if (j != colNumber) {
+            if (this.checkEqual(rowNumber, j, inMatrix, itemValue)) {
+              throw "Rule violated"
+            }
+
             if (typeof(inMatrix[rowNumber][j]) != "number" && inMatrix[rowNumber][j].includes(itemValue)) {
               somethingChanged = true;
               _.remove(inMatrix[rowNumber][j], item => item == itemValue)
@@ -101,6 +118,9 @@
         var somethingChanged = false;
         for (var i = 0; i < this.height; i++) {
           if (i != rowNumber) {
+            if (this.checkEqual(i, colNumber, inMatrix, itemValue)) {
+              throw "Rule violated"
+            }
             if (typeof(inMatrix[i][colNumber]) != "number" && inMatrix[i][colNumber].includes(itemValue)) {
               somethingChanged = true;
               _.remove(inMatrix[i][colNumber], item => item == itemValue)
@@ -122,6 +142,11 @@
         for (var i = startRow; i < startRow + rowCount; i++) {
           for (var j = startCol; j < startCol + colCount; j++) {
             if (!(i === rowNumber && j === colNumber)) {
+
+              if (this.checkEqual(i, j, inMatrix, itemValue)) {
+                throw "Rule violated"
+              }
+
               if (typeof(inMatrix[i][j]) != "number" && inMatrix[i][j].includes(itemValue)) {
                 somethingChanged = true;
                 _.remove(inMatrix[i][j], item => item == itemValue)
@@ -171,6 +196,12 @@
         return true
       },
 
+      isNumber(inMatrix, i, j) {
+        if (inMatrix[i][j] === null) return false
+        if (typeof(inMatrix[i][j]) === "number") return true
+        if (inMatrix[i][j].length === 1) return true
+        return false
+      },
       trySolve: function (candidateMatrix) {
 
         var someThingChanged = false;
@@ -243,9 +274,30 @@
 
         this.trySolve(this.rows)
 
+        // Non-recursively back trace
+
+        var possibleCoordinates = []
+
+        for (var i = 0; i < this.height; i++) {
+          for (var j = 0; j < this.width; j++) {
+            if (!this.isNumber(startMatrix[i][j])) {
+              possibleCoordinates.push({i:i,j:j})
+            }
+          }
+        }
+
+        var stack = [];
+
+        stack.push( {
+            matrix: _.clone(this.rows),
+            possibleCoordinateIdx: 0
+          }
+        )
+
+        while(stack.empty())
+
         this.updateStats()
         this.$forceUpdate()
-
       }
     }
   }
