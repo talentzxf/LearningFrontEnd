@@ -28,6 +28,15 @@ class PathFinder {
     this.all_bricks = []
 
     this.distCache = []
+
+    for (var row = 0; row < this.height; row++) {
+      for (var col = 0; col < this.width; col++) {
+
+        if (this.matrix[row][col]) { // There's a brick in the node, can't pass
+          this.all_bricks.push([row, col])
+        }
+      }
+    }
   }
 
   addIfValid(targetSet, node) {
@@ -60,6 +69,9 @@ class PathFinder {
     return neighborCandidates
   }
 
+  distFunc(p1, p2) {
+    return Math.max(Math.abs(p1[0] - p2[0]), Math.abs(p1[1] - p2[1]))
+  }
 
   findShortestPath(start, end) {
 
@@ -72,11 +84,6 @@ class PathFinder {
 
     for (var row = 0; row < this.height; row++) {
       for (var col = 0; col < this.width; col++) {
-
-        if (this.matrix[row][col]) { // There's a brick in the node, can't pass
-          this.all_bricks.push([row, col])
-        }
-
         if (row === start[0] && col === start[1]) {
           distances[[row, col]] = 0;
           nodes.enqueue(0, [row, col]);
@@ -93,8 +100,9 @@ class PathFinder {
     while (!nodes.isEmpty()) {
       smallest = nodes.dequeue();
 
-      if (smallest[0] === end[0] && smallest[1] === end[1]) {
-        resultDistance = distances[end]
+      var manhatenDist = this.distFunc(smallest, end)
+      if (manhatenDist <= 1) {
+        resultDistance = distances[smallest] + manhatenDist;
         path = new Set();
 
         while (previous[smallest]) {
@@ -160,7 +168,7 @@ class PathFinder {
       for (var brick in curLayer) {
         for (var nextBrickIdx in this.all_bricks) {
           var nextBrick = this.all_bricks[nextBrickIdx]
-          if (this.getFromCache(brick, otherBrick) < Number.POSITIVE_INFINITY) {
+          if (this.getFromCache(brick, nextBrick) < Number.POSITIVE_INFINITY) {
             if (!minDist[this.getEdgeName(start, nextBrick)]) {
               minDist[this.getEdgeName(start, nextBrick)] = Number.POSITIVE_INFINITY
             }
@@ -168,7 +176,7 @@ class PathFinder {
             minDist[this.getEdgeName(start, nextBrick)] =
               Math.min(
                 minDist[this.getEdgeName(start, nextBrick)],
-                this.getFromCache(start, brick) + this.getFromCache(brick, otherBrick) + 1
+                this.getFromCache(start, brick) + this.getFromCache(brick, otherBrick)
               )
 
             nextLayer.push(nextBrick)
@@ -181,8 +189,9 @@ class PathFinder {
 
     // From the last layer to destination
     var resultMinDist = this.getFromCache(start, end)
-    for(var brick in curLayer){
-      resultMinDist = Math.min(resultMinDist, minDist[this.getEdgeName(start, brick)] + this.getFromCache(brick, end) + 1 )
+    for (var brickIdx in curLayer) {
+      var brick = curLayer[brickIdx]
+      resultMinDist = Math.min(resultMinDist, minDist[this.getEdgeName(start, brick)] + this.getFromCache(brick, end))
     }
 
     return resultMinDist

@@ -38,8 +38,8 @@
   export default {
     name: "ShortestPath",
     data: function () {
-      var width = 20
-      var height = 20
+      var width = 5
+      var height = 5
 
       var retValue = {
         matrix: [],
@@ -52,9 +52,13 @@
       for (var i = 0; i < height; i++) {
         retValue.matrix[i] = []
         for (var j = 0; j < width; j++) {
-          retValue.matrix[i][j] = Boolean(Math.random() < 0.3);
+          retValue.matrix[i][j] = Boolean(Math.random() < 0.0);
         }
       }
+
+      retValue.matrix[0][1] = true
+      retValue.matrix[1][1] = true
+      retValue.matrix[1][0] = true
 
       // Mark start and end points passable
       retValue.matrix[0][0] = false
@@ -71,7 +75,7 @@
       this.distance = pathResult.minDist
       console.log(this.path);
 
-      console.log(pathFinder.findShortestPathWithHammer(this.start, this.end, 1))
+      console.log(pathFinder.findShortestPathWithHammer(this.start, this.end, 2))
     }
   }
 </script>
